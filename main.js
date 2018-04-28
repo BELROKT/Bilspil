@@ -2,11 +2,14 @@
 (function () { "use strict";
 var Car = function() {
 	this.color = "";
-	this.reverseSpeed = 3;
+	this.reverseAcceleration = 0.3;
 	this.turnReverseSpeed = Math.PI / 64;
 	this.turnForwardSpeed = Math.PI / 48;
-	this.forwardSpeed = 5;
-	this.angle = 1.5 * Math.PI;
+	this.forwardAcceleration = 0.5;
+	this.speedY = 0.0;
+	this.speedX = 0.0;
+	this.maxSpeed = 3;
+	this.angle = 0.5 * Math.PI;
 	this.lengthWheels = 8;
 	this.widthWheels = 32;
 	this.length = 40;
@@ -26,33 +29,57 @@ Car.prototype = {
 		context.fillRect(-0.5 * this.length,-0.5 * this.width,this.length,this.width);
 		context.restore();
 	}
+	,capSpeed: function() {
+		if(this.speedX > this.maxSpeed) {
+			this.speedX = this.maxSpeed;
+		}
+		if(this.speedX < -this.maxSpeed) {
+			this.speedX = -this.maxSpeed;
+		}
+		if(this.speedY > this.maxSpeed) {
+			this.speedY = this.maxSpeed;
+		}
+		if(this.speedY < -this.maxSpeed) {
+			this.speedY = -this.maxSpeed;
+		}
+	}
+	,updatePosition: function() {
+		this.x += this.speedX;
+		this.y += this.speedY;
+	}
 	,forward: function() {
-		this.x += this.forwardSpeed * Math.cos(this.angle);
-		this.y += this.forwardSpeed * Math.sin(this.angle);
+		this.speedX += this.forwardAcceleration * Math.cos(this.angle);
+		this.speedY += this.forwardAcceleration * Math.sin(this.angle);
+		this.capSpeed();
 	}
 	,forwardLeft: function() {
-		this.x += this.forwardSpeed * Math.cos(this.angle);
-		this.y += this.forwardSpeed * Math.sin(this.angle);
+		this.speedX += this.forwardAcceleration * Math.cos(this.angle);
+		this.speedY += this.forwardAcceleration * Math.sin(this.angle);
 		this.angle -= this.turnForwardSpeed;
+		this.capSpeed();
 	}
 	,forwardRight: function() {
-		this.x += this.forwardSpeed * Math.cos(this.angle);
-		this.y += this.forwardSpeed * Math.sin(this.angle);
+		this.speedX += this.forwardAcceleration * Math.cos(this.angle);
+		this.speedY += this.forwardAcceleration * Math.sin(this.angle);
 		this.angle += this.turnForwardSpeed;
+		this.capSpeed();
 	}
 	,reverse: function() {
-		this.x += this.reverseSpeed * Math.cos(this.angle + Math.PI);
-		this.y += this.reverseSpeed * Math.sin(this.angle + Math.PI);
+		this.speedX += this.reverseAcceleration * Math.cos(this.angle + Math.PI);
+		this.speedY += this.reverseAcceleration * Math.sin(this.angle + Math.PI);
+		this.capSpeed();
 	}
 	,reverseLeft: function() {
-		this.x += this.reverseSpeed * Math.cos(this.angle + Math.PI);
-		this.y += this.reverseSpeed * Math.sin(this.angle + Math.PI);
+		this.speedX += this.reverseAcceleration * Math.cos(this.angle + Math.PI);
+		this.speedY += this.reverseAcceleration * Math.sin(this.angle + Math.PI);
 		this.angle += this.turnReverseSpeed;
+		this.capSpeed();
 	}
 	,reverseRight: function() {
-		this.x += this.reverseSpeed * Math.cos(this.angle + Math.PI);
-		this.y += this.reverseSpeed * Math.sin(this.angle + Math.PI);
+		this.speedX += this.reverseAcceleration * Math.cos(this.angle + Math.PI);
+		this.speedY += this.reverseAcceleration * Math.sin(this.angle + Math.PI);
 		this.angle -= this.turnReverseSpeed;
+		this.capSpeed();
 	}
 };
 var Main = function() { };
@@ -114,6 +141,8 @@ Main.main = function() {
 	var gameLoop = function() {
 		controlCar(car1,"ArrowUp","ArrowLeft","ArrowDown","ArrowRight");
 		controlCar(car2,"w","a","s","d");
+		car1.updatePosition();
+		car2.updatePosition();
 		context.clearRect(0,0,canvas.width,canvas.height);
 		car1.draw(context);
 		car2.draw(context);

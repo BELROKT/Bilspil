@@ -5,11 +5,14 @@ class Car {
     public var length = 40;
     public var widthWheels = 32;
     public var lengthWheels = 8;
-    public var angle = 1.5*Math.PI;
-    public var forwardSpeed = 5;
+    public var angle = 0.5*Math.PI;
+    public var maxSpeed = 3;
+    public var speedX = 0.0;
+    public var speedY = 0.0;
+    public var forwardAcceleration = 0.5;
     public var turnForwardSpeed = Math.PI/48;
     public var turnReverseSpeed = Math.PI/64;
-    public var reverseSpeed = 3;
+    public var reverseAcceleration = 0.3;
     public var color = "";
 
     public function new() {}
@@ -26,37 +29,63 @@ class Car {
         context.restore();
     }
 
+    function capSpeed() {
+        if (speedX > maxSpeed) {
+            speedX = maxSpeed;
+        }
+        if (speedX < -maxSpeed) {
+            speedX = -maxSpeed;
+        }
+        if (speedY > maxSpeed) {
+            speedY = maxSpeed;
+        }
+        if (speedY < -maxSpeed) {
+            speedY = -maxSpeed;
+        }
+    }
+
+    public function updatePosition() {
+        x += speedX;
+        y += speedY;
+    }
+
     public function forward() {
-        x += forwardSpeed*Math.cos(angle);
-        y += forwardSpeed*Math.sin(angle);
+        speedX += forwardAcceleration*Math.cos(angle);
+        speedY += forwardAcceleration*Math.sin(angle);
+        capSpeed();
     }
 
     public function forwardLeft() {
-        x += forwardSpeed*Math.cos(angle);
-        y += forwardSpeed*Math.sin(angle);
+        speedX += forwardAcceleration*Math.cos(angle);
+        speedY += forwardAcceleration*Math.sin(angle);
         angle -= turnForwardSpeed;
+        capSpeed();
     }
 
     public function forwardRight() {
-        x += forwardSpeed*Math.cos(angle);
-        y += forwardSpeed*Math.sin(angle);
+        speedX += forwardAcceleration*Math.cos(angle);
+        speedY += forwardAcceleration*Math.sin(angle);
         angle += turnForwardSpeed;
+        capSpeed();
     }
 
     public function reverse() {
-        x += reverseSpeed*Math.cos(angle + Math.PI);
-        y += reverseSpeed*Math.sin(angle + Math.PI);
+        speedX += reverseAcceleration*Math.cos(angle + Math.PI);
+        speedY += reverseAcceleration*Math.sin(angle + Math.PI);
+        capSpeed();
     }
 
     public function reverseLeft() {
-        x += reverseSpeed*Math.cos(angle + Math.PI);
-        y += reverseSpeed*Math.sin(angle + Math.PI);
+        speedX += reverseAcceleration*Math.cos(angle + Math.PI);
+        speedY += reverseAcceleration*Math.sin(angle + Math.PI);
         angle += turnReverseSpeed;
+        capSpeed();
     }
 
     public function reverseRight() {
-        x += reverseSpeed*Math.cos(angle + Math.PI);
-        y += reverseSpeed*Math.sin(angle + Math.PI);
+        speedX += reverseAcceleration*Math.cos(angle + Math.PI);
+        speedY += reverseAcceleration*Math.sin(angle + Math.PI);
         angle -= turnReverseSpeed;
+        capSpeed();
     }
 }

@@ -58,6 +58,8 @@ class Main {
         function gameLoop() {
             controlCar(car1, "ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight");
             controlCar(car2, "w", "a", "s", "d");
+            car1.updatePosition();
+            car2.updatePosition();
             context.clearRect(0, 0, canvas.width, canvas.height);
             car1.draw(context);
             car2.draw(context);
