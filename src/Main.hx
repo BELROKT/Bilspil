@@ -20,8 +20,8 @@ class Main {
         var car2 = new Car();
         car1.color = "#800000";
         car2.color = "#434ea1";
-        car1.x = 600;
-        car2.x = 550;
+        car1.position = new Vector(600, 300);
+        car2.position = new Vector(550, 300);
 
         Browser.window.addEventListener("keyup", function (event) {
             pressedKeys[event.key] = false;

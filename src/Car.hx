@@ -1,14 +1,12 @@
 class Car {
-    public var x = 500.0;
-    public var y = 300.0;
+    public var position = new Vector(0, 0);
     public var width = 24;
     public var length = 40;
     public var widthWheels = 32;
     public var lengthWheels = 8;
     public var angle = 0.5*Math.PI;
-    public var maxSpeed = 3;
-    public var speedX = 0.0;
-    public var speedY = 0.0;
+    public var maxVelocity = 3;
+    public var velocity = new Vector(0, 0);
     public var forwardAcceleration = 0.5;
     public var turnForwardSpeed = Math.PI/48;
     public var turnReverseSpeed = Math.PI/64;
@@ -19,7 +17,7 @@ class Car {
 
     public function draw(context: js.html.CanvasRenderingContext2D) {
         context.save();
-        context.translate(x, y);
+        context.translate(position.x, position.y);
         context.rotate(angle);
         context.fillStyle = "black";
         context.fillRect(-0.4*length, -(2/3)*width, lengthWheels, widthWheels);
@@ -30,61 +28,54 @@ class Car {
     }
 
     function capSpeed() {
-        if (speedX > maxSpeed) {
-            speedX = maxSpeed;
+        if (velocity.x > maxVelocity) {
+            velocity.x = maxVelocity;
         }
-        if (speedX < -maxSpeed) {
-            speedX = -maxSpeed;
+        if (velocity.x < -maxVelocity) {
+            velocity.x = -maxVelocity;
         }
-        if (speedY > maxSpeed) {
-            speedY = maxSpeed;
+        if (velocity.y > maxVelocity) {
+            velocity.y = maxVelocity;
         }
-        if (speedY < -maxSpeed) {
-            speedY = -maxSpeed;
+        if (velocity.y < -maxVelocity) {
+            velocity.y = -maxVelocity;
         }
     }
 
     public function updatePosition() {
-        x += speedX;
-        y += speedY;
+        position = position.add(velocity);
     }
 
     public function forward() {
-        speedX += forwardAcceleration*Math.cos(angle);
-        speedY += forwardAcceleration*Math.sin(angle);
+        velocity = velocity.add(Vector.fromAngle(angle).multiply(forwardAcceleration));
         capSpeed();
     }
 
     public function forwardLeft() {
-        speedX += forwardAcceleration*Math.cos(angle);
-        speedY += forwardAcceleration*Math.sin(angle);
+        velocity = velocity.add(Vector.fromAngle(angle).multiply(forwardAcceleration));
         angle -= turnForwardSpeed;
         capSpeed();
     }
 
     public function forwardRight() {
-        speedX += forwardAcceleration*Math.cos(angle);
-        speedY += forwardAcceleration*Math.sin(angle);
+        velocity = velocity.add(Vector.fromAngle(angle).multiply(forwardAcceleration));
         angle += turnForwardSpeed;
         capSpeed();
     }
 
     public function reverse() {
-        speedX += reverseAcceleration*Math.cos(angle + Math.PI);
-        speedY += reverseAcceleration*Math.sin(angle + Math.PI);
+        velocity = velocity.add(Vector.fromAngle(angle + Math.PI).multiply(reverseAcceleration));
         capSpeed();
     }
 
     public function reverseLeft() {
-        speedX += reverseAcceleration*Math.cos(angle + Math.PI);
-        speedY += reverseAcceleration*Math.sin(angle + Math.PI);
+        velocity = velocity.add(Vector.fromAngle(angle + Math.PI).multiply(reverseAcceleration));
         angle += turnReverseSpeed;
         capSpeed();
     }
 
     public function reverseRight() {
-        speedX += reverseAcceleration*Math.cos(angle + Math.PI);
-        speedY += reverseAcceleration*Math.sin(angle + Math.PI);
+        velocity = velocity.add(Vector.fromAngle(angle + Math.PI).multiply(reverseAcceleration));
         angle -= turnReverseSpeed;
         capSpeed();
     }
