@@ -5,7 +5,7 @@ class Car {
     public var widthWheels = 32;
     public var lengthWheels = 8;
     public var angle = 0.5*Math.PI;
-    public var maxVelocity = 3;
+    public var maxVelocity = 5.0;
     public var velocity = new Vector(0, 0);
     public var forwardAcceleration = 0.5;
     public var turnForwardSpeed = Math.PI/48;
@@ -28,17 +28,8 @@ class Car {
     }
 
     function capSpeed() {
-        if (velocity.x > maxVelocity) {
-            velocity.x = maxVelocity;
-        }
-        if (velocity.x < -maxVelocity) {
-            velocity.x = -maxVelocity;
-        }
-        if (velocity.y > maxVelocity) {
-            velocity.y = maxVelocity;
-        }
-        if (velocity.y < -maxVelocity) {
-            velocity.y = -maxVelocity;
+        if (velocity.length() > maxVelocity) {
+            velocity = velocity.unityVector().multiply(maxVelocity);
         }
     }
 

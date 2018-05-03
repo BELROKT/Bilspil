@@ -47,6 +47,10 @@ class Vector {
         return Math.sqrt(x*x+y*y);
     }
 
+    public function unityVector() {
+        return divide(length());
+    }
+
     public static function fromAngle(angle: Float) {
         var newVector = new Vector(0, 0);
 

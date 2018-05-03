@@ -6,21 +6,19 @@ var Car = function() {
 	this.turnReverseSpeed = Math.PI / 64;
 	this.turnForwardSpeed = Math.PI / 48;
 	this.forwardAcceleration = 0.5;
-	this.speedY = 0.0;
-	this.speedX = 0.0;
-	this.maxSpeed = 3;
+	this.velocity = new Vector(0,0);
+	this.maxVelocity = 5.0;
 	this.angle = 0.5 * Math.PI;
 	this.lengthWheels = 8;
 	this.widthWheels = 32;
 	this.length = 40;
 	this.width = 24;
-	this.y = 300.0;
-	this.x = 500.0;
+	this.position = new Vector(0,0);
 };
 Car.prototype = {
 	draw: function(context) {
 		context.save();
-		context.translate(this.x,this.y);
+		context.translate(this.position.x,this.position.y);
 		context.rotate(this.angle);
 		context.fillStyle = "black";
 		context.fillRect(-0.4 * this.length,-0.66666666666666663 * this.width,this.lengthWheels,this.widthWheels);
@@ -30,54 +28,38 @@ Car.prototype = {
 		context.restore();
 	}
 	,capSpeed: function() {
-		if(this.speedX > this.maxSpeed) {
-			this.speedX = this.maxSpeed;
-		}
-		if(this.speedX < -this.maxSpeed) {
-			this.speedX = -this.maxSpeed;
-		}
-		if(this.speedY > this.maxSpeed) {
-			this.speedY = this.maxSpeed;
-		}
-		if(this.speedY < -this.maxSpeed) {
-			this.speedY = -this.maxSpeed;
+		if(this.velocity.length() > this.maxVelocity) {
+			this.velocity = this.velocity.unityVector().multiply(this.maxVelocity);
 		}
 	}
 	,updatePosition: function() {
-		this.x += this.speedX;
-		this.y += this.speedY;
+		this.position = this.position.add(this.velocity);
 	}
 	,forward: function() {
-		this.speedX += this.forwardAcceleration * Math.cos(this.angle);
-		this.speedY += this.forwardAcceleration * Math.sin(this.angle);
+		this.velocity = this.velocity.add(Vector.fromAngle(this.angle).multiply(this.forwardAcceleration));
 		this.capSpeed();
 	}
 	,forwardLeft: function() {
-		this.speedX += this.forwardAcceleration * Math.cos(this.angle);
-		this.speedY += this.forwardAcceleration * Math.sin(this.angle);
+		this.velocity = this.velocity.add(Vector.fromAngle(this.angle).multiply(this.forwardAcceleration));
 		this.angle -= this.turnForwardSpeed;
 		this.capSpeed();
 	}
 	,forwardRight: function() {
-		this.speedX += this.forwardAcceleration * Math.cos(this.angle);
-		this.speedY += this.forwardAcceleration * Math.sin(this.angle);
+		this.velocity = this.velocity.add(Vector.fromAngle(this.angle).multiply(this.forwardAcceleration));
 		this.angle += this.turnForwardSpeed;
 		this.capSpeed();
 	}
 	,reverse: function() {
-		this.speedX += this.reverseAcceleration * Math.cos(this.angle + Math.PI);
-		this.speedY += this.reverseAcceleration * Math.sin(this.angle + Math.PI);
+		this.velocity = this.velocity.add(Vector.fromAngle(this.angle + Math.PI).multiply(this.reverseAcceleration));
 		this.capSpeed();
 	}
 	,reverseLeft: function() {
-		this.speedX += this.reverseAcceleration * Math.cos(this.angle + Math.PI);
-		this.speedY += this.reverseAcceleration * Math.sin(this.angle + Math.PI);
+		this.velocity = this.velocity.add(Vector.fromAngle(this.angle + Math.PI).multiply(this.reverseAcceleration));
 		this.angle += this.turnReverseSpeed;
 		this.capSpeed();
 	}
 	,reverseRight: function() {
-		this.speedX += this.reverseAcceleration * Math.cos(this.angle + Math.PI);
-		this.speedY += this.reverseAcceleration * Math.sin(this.angle + Math.PI);
+		this.velocity = this.velocity.add(Vector.fromAngle(this.angle + Math.PI).multiply(this.reverseAcceleration));
 		this.angle -= this.turnReverseSpeed;
 		this.capSpeed();
 	}
@@ -100,8 +82,8 @@ Main.main = function() {
 	var car2 = new Car();
 	car1.color = "#800000";
 	car2.color = "#434ea1";
-	car1.x = 600;
-	car2.x = 550;
+	car1.position = new Vector(600,300);
+	car2.position = new Vector(550,300);
 	window.addEventListener("keyup",function(event) {
 		var k = event.key;
 		if(__map_reserved[k] != null) {
@@ -148,6 +130,50 @@ Main.main = function() {
 		car2.draw(context);
 	};
 	new haxe_Timer(30).run = gameLoop;
+};
+var Vector = function(X,Y) {
+	this.y = 0.0;
+	this.x = 0.0;
+	this.x = X;
+	this.y = Y;
+};
+Vector.fromAngle = function(angle) {
+	var newVector = new Vector(0,0);
+	newVector.x = Math.cos(angle);
+	newVector.y = Math.sin(angle);
+	return newVector;
+};
+Vector.prototype = {
+	add: function(vector) {
+		var newVector = new Vector(0,0);
+		newVector.x = this.x + vector.x;
+		newVector.y = this.y + vector.y;
+		return newVector;
+	}
+	,subtract: function(vector) {
+		var newVector = new Vector(0,0);
+		newVector.x = this.x - vector.x;
+		newVector.y = this.y - vector.y;
+		return newVector;
+	}
+	,multiply: function(scalar) {
+		var newVector = new Vector(0,0);
+		newVector.x = this.x * scalar;
+		newVector.y = this.y * scalar;
+		return newVector;
+	}
+	,divide: function(scalar) {
+		var newVector = new Vector(0,0);
+		newVector.x = this.x / scalar;
+		newVector.y = this.y / scalar;
+		return newVector;
+	}
+	,length: function() {
+		return Math.sqrt(this.x * this.x + this.y * this.y);
+	}
+	,unityVector: function() {
+		return this.divide(this.length());
+	}
 };
 var haxe_IMap = function() { };
 var haxe_Timer = function(time_ms) {
