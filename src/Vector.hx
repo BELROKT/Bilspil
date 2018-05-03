@@ -48,6 +48,9 @@ class Vector {
     }
 
     public function unityVector() {
+        if (length() == 0) {
+            return new Vector(0, 0);
+        }
         return divide(length());
     }
 

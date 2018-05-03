@@ -11,6 +11,7 @@ class Car {
     public var turnForwardSpeed = Math.PI/48;
     public var turnReverseSpeed = Math.PI/64;
     public var reverseAcceleration = 0.3;
+    public var friction = 0.05;
     public var color = "";
 
     public function new() {}
@@ -69,5 +70,12 @@ class Car {
         velocity = velocity.add(Vector.fromAngle(angle + Math.PI).multiply(reverseAcceleration));
         angle -= turnReverseSpeed;
         capSpeed();
+    }
+
+    public function applyFriction() {
+        velocity = velocity.subtract(velocity.unityVector().multiply(friction));
+        if (velocity.length() < friction) {
+            velocity = new Vector(0, 0);
+        }
     }
 }

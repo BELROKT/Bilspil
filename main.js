@@ -2,6 +2,7 @@
 (function () { "use strict";
 var Car = function() {
 	this.color = "";
+	this.friction = 0.05;
 	this.reverseAcceleration = 0.3;
 	this.turnReverseSpeed = Math.PI / 64;
 	this.turnForwardSpeed = Math.PI / 48;
@@ -63,6 +64,12 @@ Car.prototype = {
 		this.angle -= this.turnReverseSpeed;
 		this.capSpeed();
 	}
+	,applyFriction: function() {
+		this.velocity = this.velocity.subtract(this.velocity.unityVector().multiply(this.friction));
+		if(this.velocity.length() < this.friction) {
+			this.velocity = new Vector(0,0);
+		}
+	}
 };
 var Main = function() { };
 Main.main = function() {
@@ -123,6 +130,8 @@ Main.main = function() {
 	var gameLoop = function() {
 		controlCar(car1,"ArrowUp","ArrowLeft","ArrowDown","ArrowRight");
 		controlCar(car2,"w","a","s","d");
+		car1.applyFriction();
+		car2.applyFriction();
 		car1.updatePosition();
 		car2.updatePosition();
 		context.clearRect(0,0,canvas.width,canvas.height);
@@ -172,6 +181,9 @@ Vector.prototype = {
 		return Math.sqrt(this.x * this.x + this.y * this.y);
 	}
 	,unityVector: function() {
+		if(this.length() == 0) {
+			return new Vector(0,0);
+		}
 		return this.divide(this.length());
 	}
 };
