@@ -54,6 +54,10 @@ class Vector {
         return divide(length());
     }
 
+    public function scalarProduct(vector: Vector) {
+        return x * vector.x + y * vector.y;
+    }
+
     public static function fromAngle(angle: Float) {
         var newVector = new Vector(0, 0);
 

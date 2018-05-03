@@ -32,26 +32,16 @@ class Main {
 
         function controlCar(car: Car, up: String, left: String, down: String, right: String) {
             if (pressedKeys[up]) {
-                if (pressedKeys[left]) {
-                    car.forwardLeft();
-                }
-                else if (pressedKeys[right]) {
-                    car.forwardRight();
-                }
-                else {
-                    car.forward();
-                }
+                car.forward();
             }
             if (pressedKeys[down]) {
-                if (pressedKeys[left]) {
-                    car.reverseLeft();
-                }
-                else if (pressedKeys[right]) {
-                    car.reverseRight();
-                }
-                else {
-                    car.reverse();
-                }
+                car.reverse();
+            }
+            if (pressedKeys[left]) {
+                car.left();
+            }
+            if (pressedKeys[right]) {
+                car.right();
             }
         }
 

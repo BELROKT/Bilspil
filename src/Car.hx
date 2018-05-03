@@ -8,8 +8,8 @@ class Car {
     public var maxVelocity = 5.0;
     public var velocity = new Vector(0, 0);
     public var forwardAcceleration = 0.5;
-    public var turnForwardSpeed = Math.PI/48;
-    public var turnReverseSpeed = Math.PI/64;
+    public var turnForwardSpeed = 0.01;
+    public var turnReverseSpeed = 0.01;
     public var reverseAcceleration = 0.3;
     public var friction = 0.05;
     public var color = "";
@@ -43,33 +43,28 @@ class Car {
         capSpeed();
     }
 
-    public function forwardLeft() {
-        velocity = velocity.add(Vector.fromAngle(angle).multiply(forwardAcceleration));
-        angle -= turnForwardSpeed;
-        capSpeed();
-    }
-
-    public function forwardRight() {
-        velocity = velocity.add(Vector.fromAngle(angle).multiply(forwardAcceleration));
-        angle += turnForwardSpeed;
-        capSpeed();
-    }
-
     public function reverse() {
         velocity = velocity.add(Vector.fromAngle(angle + Math.PI).multiply(reverseAcceleration));
         capSpeed();
     }
 
-    public function reverseLeft() {
-        velocity = velocity.add(Vector.fromAngle(angle + Math.PI).multiply(reverseAcceleration));
-        angle += turnReverseSpeed;
-        capSpeed();
+    public function left() {
+        turn(-1);
     }
 
-    public function reverseRight() {
-        velocity = velocity.add(Vector.fromAngle(angle + Math.PI).multiply(reverseAcceleration));
-        angle -= turnReverseSpeed;
-        capSpeed();
+    public function right() {
+        turn(1);
+    }
+
+    public function turn(direction: Float) {
+        var relativeVelocity = getRelativeVelocity();
+        if (relativeVelocity.x > 0) {
+            angle += turnForwardSpeed * direction * velocity.length();
+        }
+        if (relativeVelocity.x < 0) {
+            angle -= turnReverseSpeed * direction * velocity.length();
+        }
+        velocity = Vector.fromAngle(angle).multiply(relativeVelocity.x);
     }
 
     public function applyFriction() {
@@ -77,5 +72,29 @@ class Car {
         if (velocity.length() < friction) {
             velocity = new Vector(0, 0);
         }
+    }
+
+    public function getRelativeVelocity() {
+        if (velocity.length() == 0) {
+            return new Vector(0, 0);
+        }
+        var temp = velocity.scalarProduct(Vector.fromAngle(angle))/velocity.length();
+        
+        if (temp > 1) {
+            temp = 1;
+        }
+        if (temp < -1) {
+            temp = -1;
+        }
+
+        var vinkel = Math.acos(temp);
+        var relativeVelocity = Vector.fromAngle(vinkel).multiply(velocity.length());
+
+        if (Math.isNaN(relativeVelocity.x)) {
+            trace("x: " + velocity.x + " y: " + velocity.y);
+            trace(temp);
+        }
+
+        return relativeVelocity;
     }
 }

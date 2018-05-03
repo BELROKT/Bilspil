@@ -4,8 +4,8 @@ var Car = function() {
 	this.color = "";
 	this.friction = 0.05;
 	this.reverseAcceleration = 0.3;
-	this.turnReverseSpeed = Math.PI / 64;
-	this.turnForwardSpeed = Math.PI / 48;
+	this.turnReverseSpeed = 0.01;
+	this.turnForwardSpeed = 0.01;
 	this.forwardAcceleration = 0.5;
 	this.velocity = new Vector(0,0);
 	this.maxVelocity = 5.0;
@@ -40,35 +40,49 @@ Car.prototype = {
 		this.velocity = this.velocity.add(Vector.fromAngle(this.angle).multiply(this.forwardAcceleration));
 		this.capSpeed();
 	}
-	,forwardLeft: function() {
-		this.velocity = this.velocity.add(Vector.fromAngle(this.angle).multiply(this.forwardAcceleration));
-		this.angle -= this.turnForwardSpeed;
-		this.capSpeed();
-	}
-	,forwardRight: function() {
-		this.velocity = this.velocity.add(Vector.fromAngle(this.angle).multiply(this.forwardAcceleration));
-		this.angle += this.turnForwardSpeed;
-		this.capSpeed();
-	}
 	,reverse: function() {
 		this.velocity = this.velocity.add(Vector.fromAngle(this.angle + Math.PI).multiply(this.reverseAcceleration));
 		this.capSpeed();
 	}
-	,reverseLeft: function() {
-		this.velocity = this.velocity.add(Vector.fromAngle(this.angle + Math.PI).multiply(this.reverseAcceleration));
-		this.angle += this.turnReverseSpeed;
-		this.capSpeed();
+	,left: function() {
+		this.turn(-1);
 	}
-	,reverseRight: function() {
-		this.velocity = this.velocity.add(Vector.fromAngle(this.angle + Math.PI).multiply(this.reverseAcceleration));
-		this.angle -= this.turnReverseSpeed;
-		this.capSpeed();
+	,right: function() {
+		this.turn(1);
+	}
+	,turn: function(direction) {
+		var relativeVelocity = this.getRelativeVelocity();
+		if(relativeVelocity.x > 0) {
+			this.angle += this.turnForwardSpeed * direction * this.velocity.length();
+		}
+		if(relativeVelocity.x < 0) {
+			this.angle -= this.turnReverseSpeed * direction * this.velocity.length();
+		}
+		this.velocity = Vector.fromAngle(this.angle).multiply(relativeVelocity.x);
 	}
 	,applyFriction: function() {
 		this.velocity = this.velocity.subtract(this.velocity.unityVector().multiply(this.friction));
 		if(this.velocity.length() < this.friction) {
 			this.velocity = new Vector(0,0);
 		}
+	}
+	,getRelativeVelocity: function() {
+		if(this.velocity.length() == 0) {
+			return new Vector(0,0);
+		}
+		var temp = this.velocity.scalarProduct(Vector.fromAngle(this.angle)) / this.velocity.length();
+		if(temp > 1) {
+			temp = 1;
+		}
+		if(temp < -1) {
+			temp = -1;
+		}
+		var relativeVelocity = Vector.fromAngle(Math.acos(temp)).multiply(this.velocity.length());
+		if(isNaN(relativeVelocity.x)) {
+			console.log("x: " + this.velocity.x + " y: " + this.velocity.y);
+			console.log(temp);
+		}
+		return relativeVelocity;
 	}
 };
 var Main = function() { };
@@ -109,22 +123,16 @@ Main.main = function() {
 	});
 	var controlCar = function(car,up,left,down,right) {
 		if(__map_reserved[up] != null ? pressedKeys.getReserved(up) : pressedKeys.h[up]) {
-			if(__map_reserved[left] != null ? pressedKeys.getReserved(left) : pressedKeys.h[left]) {
-				car.forwardLeft();
-			} else if(__map_reserved[right] != null ? pressedKeys.getReserved(right) : pressedKeys.h[right]) {
-				car.forwardRight();
-			} else {
-				car.forward();
-			}
+			car.forward();
 		}
 		if(__map_reserved[down] != null ? pressedKeys.getReserved(down) : pressedKeys.h[down]) {
-			if(__map_reserved[left] != null ? pressedKeys.getReserved(left) : pressedKeys.h[left]) {
-				car.reverseLeft();
-			} else if(__map_reserved[right] != null ? pressedKeys.getReserved(right) : pressedKeys.h[right]) {
-				car.reverseRight();
-			} else {
-				car.reverse();
-			}
+			car.reverse();
+		}
+		if(__map_reserved[left] != null ? pressedKeys.getReserved(left) : pressedKeys.h[left]) {
+			car.left();
+		}
+		if(__map_reserved[right] != null ? pressedKeys.getReserved(right) : pressedKeys.h[right]) {
+			car.right();
 		}
 	};
 	var gameLoop = function() {
@@ -185,6 +193,9 @@ Vector.prototype = {
 			return new Vector(0,0);
 		}
 		return this.divide(this.length());
+	}
+	,scalarProduct: function(vector) {
+		return this.x * vector.x + this.y * vector.y;
 	}
 };
 var haxe_IMap = function() { };
