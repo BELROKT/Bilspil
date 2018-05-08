@@ -6,8 +6,8 @@ class Car {
     public var length = 40;
     public var widthWheels = 4;
     public var lengthWheels = 8;
-    public var angle = 0.5*Math.PI;
-    public var maxVelocityForward = 8.0;
+    public var angle = 0*Math.PI;
+    public var maxVelocityForward = 6.5;
     public var maxVelocityReverse = 4.0;
     public var velocity = new Vector(0, 0);
     public var forwardAcceleration = 0.5;
