@@ -1,16 +1,19 @@
+enum CarAction {Forward; Reverse; Right; Left;}
+
 class Car {
     public var position = new Vector(0, 0);
     public var width = 24;
     public var length = 40;
-    public var widthWheels = 32;
+    public var widthWheels = 4;
     public var lengthWheels = 8;
     public var angle = 0.5*Math.PI;
-    public var maxVelocity = 5.0;
+    public var maxVelocityForward = 8.0;
+    public var maxVelocityReverse = 4.0;
     public var velocity = new Vector(0, 0);
     public var forwardAcceleration = 0.5;
-    public var turnForwardSpeed = 0.01;
-    public var turnReverseSpeed = 0.01;
     public var reverseAcceleration = 0.3;
+    public var turnSpeed = 0.01;
+    public var turnAngle = 0.0;
     public var friction = 0.05;
     public var color = "";
 
@@ -20,15 +23,25 @@ class Car {
         context.save();
         context.translate(position.x, position.y);
         context.rotate(angle);
-        context.fillStyle = "black";
-        context.fillRect(-0.4*length, -(2/3)*width, lengthWheels, widthWheels);
-        context.fillRect(0.2*length, -(2/3)*width, lengthWheels, widthWheels);
+        drawWheel(context, -0.3*length, -0.5*width, 0);
+        drawWheel(context, -0.3*length, 0.5*width, 0);
+        drawWheel(context, 0.3*length, -0.5*width, turnAngle);
+        drawWheel(context, 0.3*length, 0.5*width, turnAngle);
         context.fillStyle = color;
         context.fillRect(-0.5*length, -0.5*width, length, width);
         context.restore();
     }
 
-    function capSpeed() {
+    public function drawWheel(context: js.html.CanvasRenderingContext2D, x: Float, y: Float, angle: Float) {
+        context.save();
+        context.translate(x, y);
+        context.rotate(angle);
+        context.fillStyle = "black";
+        context.fillRect(-0.5*lengthWheels, -0.5*widthWheels, lengthWheels, widthWheels);
+        context.restore();
+    }
+
+    function capSpeed(maxVelocity) {
         if (velocity.length() > maxVelocity) {
             velocity = velocity.unityVector().multiply(maxVelocity);
         }
@@ -38,31 +51,64 @@ class Car {
         position = position.add(velocity);
     }
 
-    public function forward() {
+    public function controlInput(actions: Array<CarAction>) {
+        turnAngle = 0;
+        for(action in actions) {
+            handleAction(action);
+        }
+    }
+
+    function handleAction(action: CarAction) {
+        if (action == Forward) {
+            forward();
+        }
+        if (action == Reverse) {
+            reverse();
+        }
+        if (action == Left) {
+            left();
+        }
+        if (action == Right) {
+            right();
+        }
+    }
+
+    function forward() {
         velocity = velocity.add(Vector.fromAngle(angle).multiply(forwardAcceleration));
-        capSpeed();
+        capSpeed(maxVelocityForward);
     }
 
-    public function reverse() {
-        velocity = velocity.add(Vector.fromAngle(angle + Math.PI).multiply(reverseAcceleration));
-        capSpeed();
+    function reverse() {
+        var accelerationVector = Vector.fromAngle(angle + Math.PI).multiply(reverseAcceleration);
+
+        velocity = velocity.add(accelerationVector);
+        if (velocity.x*accelerationVector.x > 0 && velocity.y*accelerationVector.y > 0) {
+            capSpeed(maxVelocityReverse);
+        }
+        else {
+            capSpeed(maxVelocityForward);
+        }
     }
 
-    public function left() {
+    function left() {
+        turnAngle -= 0.3;
+
         turn(-1);
     }
 
-    public function right() {
+    function right() {
+        turnAngle += 0.3;
+
         turn(1);
     }
 
     public function turn(direction: Float) {
         var relativeVelocity = getRelativeVelocity();
         if (relativeVelocity.x > 0) {
-            angle += turnForwardSpeed * direction * velocity.length();
+            angle += turnSpeed * direction * velocity.length();
         }
         if (relativeVelocity.x < 0) {
-            angle -= turnReverseSpeed * direction * velocity.length();
+            angle -= turnSpeed * direction * velocity.length();
         }
         velocity = Vector.fromAngle(angle).multiply(relativeVelocity.x);
     }

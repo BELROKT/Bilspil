@@ -31,18 +31,20 @@ class Main {
         });
 
         function controlCar(car: Car, up: String, left: String, down: String, right: String) {
+            var actions: Array<Car.CarAction> = [];
             if (pressedKeys[up]) {
-                car.forward();
+                actions.push(Forward);
             }
             if (pressedKeys[down]) {
-                car.reverse();
+                actions.push(Reverse);
             }
             if (pressedKeys[left]) {
-                car.left();
+                actions.push(Left);
             }
             if (pressedKeys[right]) {
-                car.right();
+                actions.push(Right);
             }
+            car.controlInput(actions);
         }
 
         function gameLoop() {
