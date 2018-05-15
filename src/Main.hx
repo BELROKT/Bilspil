@@ -23,15 +23,15 @@ class Main {
         car1.position = new Vector(400, 200);
         car2.position = new Vector(400, 240);
         var environment = new Environment();
-        environment.buildRoadCorner(new Vector(1275, 220), 0*Math.PI);
+        environment.buildRoadCorner(new Vector(1275, 220), 1.5*Math.PI);
         environment.buildRoadCorner(new Vector(1275, 525), 0*Math.PI);
-        environment.buildRoadCorner(new Vector(170, 525), 0*Math.PI);
-        environment.buildRoadCorner(new Vector(170, 220), 0*Math.PI);
-        environment.buildRoad(new Vector(722.5, 220), 1015, 0*Math.PI);
-        environment.buildRoad(new Vector(1275, 372.5), 215, 0.5*Math.PI);
-        environment.buildRoad(new Vector(722.5, 525), 1015, 0*Math.PI);
-        environment.buildRoad(new Vector(170, 372.5), 215, 0.5*Math.PI);
-        environment.boxList.push(new Box(new Vector(425, 220), 4, 90, 0*Math.PI, "yellow"));
+        environment.buildRoadCorner(new Vector(170, 525), 0.5*Math.PI);
+        environment.buildRoadCorner(new Vector(170, 220), 1*Math.PI);
+        environment.buildRoad(new Vector(722.5, 220), 1005, 0*Math.PI);
+        environment.buildRoad(new Vector(1275, 372.5), 205, 0.5*Math.PI);
+        environment.buildRoad(new Vector(722.5, 525), 1005, 0*Math.PI);
+        environment.buildRoad(new Vector(170, 372.5), 205, 0.5*Math.PI);
+        environment.objects.push(new Box(new Vector(425, 220), 4, 90, 0*Math.PI, "yellow"));
 
         Browser.window.addEventListener("keyup", function (event) {
             pressedKeys[event.key] = false;

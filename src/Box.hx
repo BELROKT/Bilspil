@@ -1,8 +1,8 @@
-class Box {
+class Box implements Drawable {
     var position = new Vector(0, 0);
     var width = 0.0;
     var height = 0.0;
-    var angle = 0*Math.PI;
+    var angle = 0.0;
     var color = "";
 
     public function new(position: Vector, width: Float, height: Float, angle: Float, color: String) {
