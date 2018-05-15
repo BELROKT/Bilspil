@@ -277,6 +277,20 @@ Main.main = function() {
 		}
 		car.controlInput(actions);
 	};
+	var calculateScaleFactor = function() {
+		var carDistance = car1.position.subtract(car2.position);
+		var scaleFactor = 1.0;
+		var scaleHorisontal = 1.0;
+		var scaleVertical = 1.0;
+		if(Math.abs(carDistance.y) >= canvas.height - 50) {
+			scaleVertical = (canvas.height - 50) / Math.abs(carDistance.y);
+		}
+		if(Math.abs(carDistance.x) >= canvas.width - 50) {
+			scaleHorisontal = (canvas.width - 50) / Math.abs(carDistance.x);
+		}
+		scaleFactor = Math.min(scaleHorisontal,scaleVertical);
+		return scaleFactor;
+	};
 	var gameLoop = function() {
 		controlCar(car1,"ArrowUp","ArrowLeft","ArrowDown","ArrowRight");
 		controlCar(car2,"w","a","s","d");
@@ -285,9 +299,16 @@ Main.main = function() {
 		car1.updatePosition();
 		car2.updatePosition();
 		context.clearRect(0,0,canvas.width,canvas.height);
+		context.save();
+		var scaleFactor1 = calculateScaleFactor();
+		var focusPoint = car1.position.add(car2.position).divide(2 / scaleFactor1);
+		var midPoint = new Vector(0.5 * canvas.width,0.5 * canvas.height);
+		context.translate(midPoint.x - focusPoint.x,midPoint.y - focusPoint.y);
+		context.scale(scaleFactor1,scaleFactor1);
 		environment.draw(context);
 		car1.draw(context);
 		car2.draw(context);
+		context.restore();
 	};
 	new haxe_Timer(30).run = gameLoop;
 };
