@@ -239,29 +239,6 @@ Environment.prototype = {
 			object.draw(context);
 		}
 	}
-	,buildRoad: function(position,length,angle,width) {
-		if(width == null) {
-			width = 100.0;
-		}
-		this.objects.push(new Box(position,length,width,angle,"#505554"));
-		this.objects.push(new Box(position,length,width - 10,angle,"#606665"));
-	}
-	,buildRoadCorner: function(position,angle,length,width) {
-		if(width == null) {
-			width = 100.0;
-		}
-		if(length == null) {
-			length = 100.0;
-		}
-		var compoundBox = new CompoundBox();
-		compoundBox.position = position;
-		compoundBox.angle = angle;
-		compoundBox.boxList.push(new Box(new Vector(0,0),length,width,0,"#505554"));
-		compoundBox.boxList.push(new Box(new Vector(-2.5,-2.5),length - 5,width - 5,0,"#606665"));
-		compoundBox.boxList.push(new Box(new Vector(-0.5 * length + 2.5,-0.5 * width + 2.5),5,5,0,"#505554"));
-		compoundBox.addCollisionBox(new Box(new Vector(0,0),length,width,0,"#505554"));
-		this.objects.push(compoundBox);
-	}
 	,__class__: Environment
 };
 var Main = function() { };
@@ -286,14 +263,14 @@ Main.main = function() {
 	car1.position = new Vector(400,200);
 	car2.position = new Vector(400,240);
 	var environment = new Environment();
-	environment.buildRoadCorner(new Vector(1275,220),1.5 * Math.PI);
-	environment.buildRoadCorner(new Vector(1275,525),0 * Math.PI);
-	environment.buildRoadCorner(new Vector(170,525),0.5 * Math.PI);
-	environment.buildRoadCorner(new Vector(170,220),Math.PI);
-	environment.buildRoad(new Vector(722.5,220),1005,0 * Math.PI);
-	environment.buildRoad(new Vector(1275,372.5),205,0.5 * Math.PI);
-	environment.buildRoad(new Vector(722.5,525),1005,0 * Math.PI);
-	environment.buildRoad(new Vector(170,372.5),205,0.5 * Math.PI);
+	environment.objects.push(Road.buildRoadCorner(new Vector(1275,220),1.5 * Math.PI));
+	environment.objects.push(Road.buildRoadCorner(new Vector(1275,525),0 * Math.PI));
+	environment.objects.push(Road.buildRoadCorner(new Vector(170,525),0.5 * Math.PI));
+	environment.objects.push(Road.buildRoadCorner(new Vector(170,220),Math.PI));
+	environment.objects.push(Road.buildRoad(new Vector(722.5,220),1005,0 * Math.PI));
+	environment.objects.push(Road.buildRoad(new Vector(1275,372.5),205,0.5 * Math.PI));
+	environment.objects.push(Road.buildRoad(new Vector(722.5,525),1005,0 * Math.PI));
+	environment.objects.push(Road.buildRoad(new Vector(170,372.5),205,0.5 * Math.PI));
 	environment.objects.push(new Box(new Vector(425,220),4,90,0 * Math.PI,"yellow"));
 	window.addEventListener("keyup",function(event) {
 		var k = event.key;
@@ -341,25 +318,41 @@ Main.main = function() {
 		scaleFactor = Math.min(scaleHorisontal,scaleVertical);
 		return scaleFactor;
 	};
-	var gameLoop = function() {
-		controlCar(car1,"ArrowUp","ArrowLeft","ArrowDown","ArrowRight");
-		controlCar(car2,"w","a","s","d");
-		car1.applyFriction();
-		car2.applyFriction();
-		car1.updatePosition();
-		car2.updatePosition();
-		car1.color = "green";
+	var getCollidingObjects = function(point) {
+		var collidingObjects = [];
 		var _g = 0;
 		var _g1 = environment.objects;
 		while(_g < _g1.length) {
 			var object = _g1[_g];
 			++_g;
 			if(js_Boot.__instanceof(object,Collidable)) {
-				if(Collision.collidesWith(car1.position,js_Boot.__cast(object , Collidable))) {
-					car1.color = "yellow";
+				if(Collision.collidesWith(point,js_Boot.__cast(object , Collidable))) {
+					collidingObjects.push(object);
 				}
 			}
 		}
+		return collidingObjects;
+	};
+	var gameLoop = function() {
+		var collidingObjects1 = getCollidingObjects(car1.position);
+		controlCar(car1,"ArrowUp","ArrowLeft","ArrowDown","ArrowRight");
+		controlCar(car2,"w","a","s","d");
+		var onRoad = false;
+		var _g2 = 0;
+		while(_g2 < collidingObjects1.length) {
+			var object1 = collidingObjects1[_g2];
+			++_g2;
+			if(js_Boot.__instanceof(object1,Road)) {
+				onRoad = true;
+			}
+		}
+		if(!onRoad) {
+			car1.applyFriction();
+		}
+		car2.applyFriction();
+		car1.updatePosition();
+		car2.updatePosition();
+		car1.color = "green";
 		context.clearRect(0,0,canvas.width,canvas.height);
 		context.save();
 		var scaleFactor1 = calculateScaleFactor();
@@ -377,6 +370,42 @@ Main.main = function() {
 var _$Math_Math_$Impl_$ = function() { };
 _$Math_Math_$Impl_$.__name__ = true;
 Math.__name__ = true;
+var Road = function() {
+	CompoundBox.call(this);
+};
+Road.__name__ = true;
+Road.buildRoad = function(position,length,angle,width) {
+	if(width == null) {
+		width = 100.0;
+	}
+	var road = new Road();
+	road.position = position;
+	road.angle = angle;
+	road.boxList.push(new Box(new Vector(0,0),length,width,0,"#505554"));
+	road.boxList.push(new Box(new Vector(0,0),length,width - 10,0,"#606665"));
+	road.addCollisionBox(new Box(new Vector(0,0),length,width,0,"#505554"));
+	return road;
+};
+Road.buildRoadCorner = function(position,angle,length,width) {
+	if(width == null) {
+		width = 100.0;
+	}
+	if(length == null) {
+		length = 100.0;
+	}
+	var road = new Road();
+	road.position = position;
+	road.angle = angle;
+	road.boxList.push(new Box(new Vector(0,0),length,width,0,"#505554"));
+	road.boxList.push(new Box(new Vector(-2.5,-2.5),length - 5,width - 5,0,"#606665"));
+	road.boxList.push(new Box(new Vector(-0.5 * length + 2.5,-0.5 * width + 2.5),5,5,0,"#505554"));
+	road.addCollisionBox(new Box(new Vector(0,0),length,width,0,"#505554"));
+	return road;
+};
+Road.__super__ = CompoundBox;
+Road.prototype = $extend(CompoundBox.prototype,{
+	__class__: Road
+});
 var Std = function() { };
 Std.__name__ = true;
 Std.string = function(s) {

@@ -23,14 +23,14 @@ class Main {
         car1.position = new Vector(400, 200);
         car2.position = new Vector(400, 240);
         var environment = new Environment();
-        environment.buildRoadCorner(new Vector(1275, 220), 1.5*Math.PI);
-        environment.buildRoadCorner(new Vector(1275, 525), 0*Math.PI);
-        environment.buildRoadCorner(new Vector(170, 525), 0.5*Math.PI);
-        environment.buildRoadCorner(new Vector(170, 220), 1*Math.PI);
-        environment.buildRoad(new Vector(722.5, 220), 1005, 0*Math.PI);
-        environment.buildRoad(new Vector(1275, 372.5), 205, 0.5*Math.PI);
-        environment.buildRoad(new Vector(722.5, 525), 1005, 0*Math.PI);
-        environment.buildRoad(new Vector(170, 372.5), 205, 0.5*Math.PI);
+        environment.objects.push(Road.buildRoadCorner(new Vector(1275, 220), 1.5*Math.PI));
+        environment.objects.push(Road.buildRoadCorner(new Vector(1275, 525), 0*Math.PI));
+        environment.objects.push(Road.buildRoadCorner(new Vector(170, 525), 0.5*Math.PI));
+        environment.objects.push(Road.buildRoadCorner(new Vector(170, 220), 1*Math.PI));
+        environment.objects.push(Road.buildRoad(new Vector(722.5, 220), 1005, 0*Math.PI));
+        environment.objects.push(Road.buildRoad(new Vector(1275, 372.5), 205, 0.5*Math.PI));
+        environment.objects.push(Road.buildRoad(new Vector(722.5, 525), 1005, 0*Math.PI));
+        environment.objects.push(Road.buildRoad(new Vector(170, 372.5), 205, 0.5*Math.PI));
         environment.objects.push(new Box(new Vector(425, 220), 4, 90, 0*Math.PI, "yellow"));
 
         Browser.window.addEventListener("keyup", function (event) {
@@ -73,21 +73,36 @@ class Main {
             return scaleFactor;
         }
 
+        function getCollidingObjects(point: Vector) {
+            var collidingObjects = [];
+
+            for(object in environment.objects) {
+                if(Std.is(object, Collidable)) {
+                    if(Collision.collidesWith(point, cast(object,Collidable))) {
+                        collidingObjects.push(object);
+                    }
+                }
+            }
+
+            return collidingObjects;
+        }
+
         function gameLoop() {
+            var collidingObjects = getCollidingObjects(car1.position);
             controlCar(car1, "ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight");
             controlCar(car2, "w", "a", "s", "d");
-            car1.applyFriction();
+            var onRoad = false;
+            for(object in collidingObjects) {
+                if(Std.is(object, Road)) {
+                    onRoad = true;
+                }
+            }
+            if(!onRoad)
+                car1.applyFriction();
             car2.applyFriction();
             car1.updatePosition();
             car2.updatePosition();
             car1.color = "green";
-            for(object in environment.objects){
-                if(Std.is(object, Collidable)){
-                    if(Collision.collidesWith(car1.position, cast(object,Collidable))){
-                        car1.color = "yellow";
-                    }
-                }
-            }
             context.clearRect(0, 0, canvas.width, canvas.height);
             context.save();
             var scaleFactor = calculateScaleFactor();
