@@ -80,6 +80,14 @@ class Main {
             car2.applyFriction();
             car1.updatePosition();
             car2.updatePosition();
+            car1.color = "green";
+            for(object in environment.objects){
+                if(Std.is(object, Collidable)){
+                    if(Collision.collidesWith(car1.position, cast(object,Collidable))){
+                        car1.color = "yellow";
+                    }
+                }
+            }
             context.clearRect(0, 0, canvas.width, canvas.height);
             context.save();
             var scaleFactor = calculateScaleFactor();

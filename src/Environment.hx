@@ -22,6 +22,7 @@ class Environment {
         compoundBox.boxList.push(new Box(new Vector(0, 0), length, width, 0, "#505554"));
         compoundBox.boxList.push(new Box(new Vector(-2.5, -2.5), length-5, width-5, 0, "#606665"));
         compoundBox.boxList.push(new Box(new Vector(-0.5*length+2.5, -0.5*width+2.5), 5, 5, 0, "#505554"));
+        compoundBox.addCollisionBox(new Box(new Vector(0, 0), length, width, 0, "#505554"));
         objects.push(compoundBox);
     }
 }

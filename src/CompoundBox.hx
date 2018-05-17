@@ -1,7 +1,8 @@
-class CompoundBox implements Drawable {
+class CompoundBox implements Drawable implements Collidable {
     public var position = new Vector(0, 0);
     public var angle = 0.0;
     public var boxList: Array<Box> = [];
+    public var collisionBox: Box;
     
     public function new() {}
 
@@ -13,5 +14,15 @@ class CompoundBox implements Drawable {
             box.draw(context);
         }
         context.restore();
+    }
+
+    public function getCollisionBox() {
+        return collisionBox;
+    }
+
+    public function addCollisionBox(box: Box) {
+        box.position = position.add(box.position.turnAngle(angle));
+        box.angle = box.angle + angle;
+        collisionBox = box;
     }
 }

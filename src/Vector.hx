@@ -58,6 +58,25 @@ class Vector {
         return x * vector.x + y * vector.y;
     }
 
+    public function turnAngle(angle: Float) {
+        var newVector = new Vector(0, 0);
+
+        newVector = fromAngle(angle + getAngle()).multiply(length());
+
+        if(Math.isNaN(newVector.x)) {
+            newVector.x = 0;
+        }
+        if(Math.isNaN(newVector.y)) {
+            newVector.y = 0;
+        }
+
+        return newVector;
+    }
+
+    public function getAngle() {
+        return Math.acos((Math.pow(x, 2) + Math.pow(length(), 2) - Math.pow(y, 2)) / (2*x * length()));
+    }
+
     public static function fromAngle(angle: Float) {
         var newVector = new Vector(0, 0);
 
