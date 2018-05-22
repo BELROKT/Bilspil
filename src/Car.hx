@@ -16,6 +16,8 @@ class Car {
     public var turnAngle = 0.0;
     public var friction = 0.0;
     public var color = "";
+    public var name = "";
+    public var nameColor = "";
 
     public function new() {}
 
@@ -29,6 +31,11 @@ class Car {
         drawWheel(context, 0.3*length, 0.5*width, turnAngle);
         context.fillStyle = color;
         context.fillRect(-0.5*length, -0.5*width, length, width);
+        context.fillStyle = nameColor;
+        context.font = "16px Arial";
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        context.fillText(name, 0, 1, 38);
         context.restore();
     }
 

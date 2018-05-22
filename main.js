@@ -54,6 +54,8 @@ CarAction.Right.__enum__ = CarAction;
 CarAction.Left = ["Left",3];
 CarAction.Left.__enum__ = CarAction;
 var Car = function() {
+	this.nameColor = "";
+	this.name = "";
 	this.color = "";
 	this.friction = 0.0;
 	this.turnAngle = 0.0;
@@ -82,6 +84,11 @@ Car.prototype = {
 		this.drawWheel(context,0.3 * this.length,0.5 * this.width,this.turnAngle);
 		context.fillStyle = this.color;
 		context.fillRect(-0.5 * this.length,-0.5 * this.width,this.length,this.width);
+		context.fillStyle = this.nameColor;
+		context.font = "16px Arial";
+		context.textAlign = "center";
+		context.textBaseline = "middle";
+		context.fillText(this.name,0,1,38);
 		context.restore();
 	}
 	,drawWheel: function(context,x,y,angle) {
@@ -257,6 +264,10 @@ Main.main = function() {
 	var car2 = new Car();
 	car1.color = "#800000";
 	car2.color = "#434ea1";
+	car1.name = "Bjørn";
+	car2.name = "Lundin";
+	car1.nameColor = "black";
+	car2.nameColor = "black";
 	car1.position = new Vector(400,200);
 	car2.position = new Vector(400,240);
 	var environment = new Environment();
@@ -353,7 +364,6 @@ Main.main = function() {
 		car2.applyFriction(gameLoop4);
 		car1.updatePosition();
 		car2.updatePosition();
-		car1.color = "green";
 		context.clearRect(0,0,canvas.width,canvas.height);
 		context.save();
 		var scaleFactor1 = calculateScaleFactor();

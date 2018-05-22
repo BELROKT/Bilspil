@@ -20,6 +20,10 @@ class Main {
         var car2 = new Car();
         car1.color = "#800000";
         car2.color = "#434ea1";
+        car1.name = "Bjørn";
+        car2.name = "Lundin";
+        car1.nameColor = "black";
+        car2.nameColor = "black";
         car1.position = new Vector(400, 200);
         car2.position = new Vector(400, 240);
         var environment = new Environment();
@@ -104,7 +108,6 @@ class Main {
             car2.applyFriction(getFriction(getCollidingObjects(car2.position)));
             car1.updatePosition();
             car2.updatePosition();
-            car1.color = "green";
             context.clearRect(0, 0, canvas.width, canvas.height);
             context.save();
             var scaleFactor = calculateScaleFactor();
