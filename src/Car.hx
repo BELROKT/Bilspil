@@ -7,14 +7,14 @@ class Car {
     public var widthWheels = 4;
     public var lengthWheels = 8;
     public var angle = 0*Math.PI;
-    public var maxVelocityForward = 6.5;
-    public var maxVelocityReverse = 4.0;
     public var velocity = new Vector(0, 0);
+    public var baseForwardAcceleration = 0.5;
+    public var baseReverseAcceleration = 0.3;
     public var forwardAcceleration = 0.5;
     public var reverseAcceleration = 0.3;
     public var turnSpeed = 0.01;
     public var turnAngle = 0.0;
-    public var friction = 0.05;
+    public var friction = 0.0;
     public var color = "";
 
     public function new() {}
@@ -39,12 +39,6 @@ class Car {
         context.fillStyle = "black";
         context.fillRect(-0.5*lengthWheels, -0.5*widthWheels, lengthWheels, widthWheels);
         context.restore();
-    }
-
-    function capSpeed(maxVelocity) {
-        if (velocity.length() > maxVelocity) {
-            velocity = velocity.unityVector().multiply(maxVelocity);
-        }
     }
 
     public function updatePosition() {
@@ -75,19 +69,12 @@ class Car {
 
     function forward() {
         velocity = velocity.add(Vector.fromAngle(angle).multiply(forwardAcceleration));
-        capSpeed(maxVelocityForward);
     }
 
     function reverse() {
         var accelerationVector = Vector.fromAngle(angle + Math.PI).multiply(reverseAcceleration);
 
         velocity = velocity.add(accelerationVector);
-        if (velocity.x*accelerationVector.x > 0 && velocity.y*accelerationVector.y > 0) {
-            capSpeed(maxVelocityReverse);
-        }
-        else {
-            capSpeed(maxVelocityForward);
-        }
     }
 
     function left() {
@@ -113,7 +100,11 @@ class Car {
         velocity = Vector.fromAngle(angle).multiply(relativeVelocity.x);
     }
 
-    public function applyFriction() {
+    public function applyFriction(frictionFactor: Float) {
+        friction = velocity.length() * frictionFactor;
+        forwardAcceleration = baseForwardAcceleration - friction;
+        reverseAcceleration = baseReverseAcceleration - friction;
+        
         velocity = velocity.subtract(velocity.unityVector().multiply(friction));
         if (velocity.length() < friction) {
             velocity = new Vector(0, 0);

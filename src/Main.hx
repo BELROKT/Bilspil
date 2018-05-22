@@ -87,19 +87,21 @@ class Main {
             return collidingObjects;
         }
 
-        function gameLoop() {
-            var collidingObjects = getCollidingObjects(car1.position);
-            controlCar(car1, "ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight");
-            controlCar(car2, "w", "a", "s", "d");
-            var onRoad = false;
+        function getFriction(collidingObjects: Array<Dynamic>) {
+            var friction = 0.048;
             for(object in collidingObjects) {
                 if(Std.is(object, Road)) {
-                    onRoad = true;
+                    friction = 0.032;
                 }
             }
-            if(!onRoad)
-                car1.applyFriction();
-            car2.applyFriction();
+            return friction;
+        }
+
+        function gameLoop() {
+            controlCar(car1, "ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight");
+            controlCar(car2, "w", "a", "s", "d");
+            car1.applyFriction(getFriction(getCollidingObjects(car1.position)));
+            car2.applyFriction(getFriction(getCollidingObjects(car2.position)));
             car1.updatePosition();
             car2.updatePosition();
             car1.color = "green";

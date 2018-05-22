@@ -1,3 +1,5 @@
+enum Terrain {Grass; Road;}
+
 class Environment {
     public var objects: Array<Drawable> = [];
 

@@ -55,14 +55,14 @@ CarAction.Left = ["Left",3];
 CarAction.Left.__enum__ = CarAction;
 var Car = function() {
 	this.color = "";
-	this.friction = 0.05;
+	this.friction = 0.0;
 	this.turnAngle = 0.0;
 	this.turnSpeed = 0.01;
 	this.reverseAcceleration = 0.3;
 	this.forwardAcceleration = 0.5;
+	this.baseReverseAcceleration = 0.3;
+	this.baseForwardAcceleration = 0.5;
 	this.velocity = new Vector(0,0);
-	this.maxVelocityReverse = 4.0;
-	this.maxVelocityForward = 6.5;
 	this.angle = 0 * Math.PI;
 	this.lengthWheels = 8;
 	this.widthWheels = 4;
@@ -92,11 +92,6 @@ Car.prototype = {
 		context.fillRect(-0.5 * this.lengthWheels,-0.5 * this.widthWheels,this.lengthWheels,this.widthWheels);
 		context.restore();
 	}
-	,capSpeed: function(maxVelocity) {
-		if(this.velocity.length() > maxVelocity) {
-			this.velocity = this.velocity.unityVector().multiply(maxVelocity);
-		}
-	}
 	,updatePosition: function() {
 		this.position = this.position.add(this.velocity);
 	}
@@ -125,16 +120,10 @@ Car.prototype = {
 	}
 	,forward: function() {
 		this.velocity = this.velocity.add(Vector.fromAngle(this.angle).multiply(this.forwardAcceleration));
-		this.capSpeed(this.maxVelocityForward);
 	}
 	,reverse: function() {
 		var accelerationVector = Vector.fromAngle(this.angle + Math.PI).multiply(this.reverseAcceleration);
 		this.velocity = this.velocity.add(accelerationVector);
-		if(this.velocity.x * accelerationVector.x > 0 && this.velocity.y * accelerationVector.y > 0) {
-			this.capSpeed(this.maxVelocityReverse);
-		} else {
-			this.capSpeed(this.maxVelocityForward);
-		}
 	}
 	,left: function() {
 		this.turnAngle -= 0.3;
@@ -154,7 +143,10 @@ Car.prototype = {
 		}
 		this.velocity = Vector.fromAngle(this.angle).multiply(relativeVelocity.x);
 	}
-	,applyFriction: function() {
+	,applyFriction: function(frictionFactor) {
+		this.friction = this.velocity.length() * frictionFactor;
+		this.forwardAcceleration = this.baseForwardAcceleration - this.friction;
+		this.reverseAcceleration = this.baseReverseAcceleration - this.friction;
 		this.velocity = this.velocity.subtract(this.velocity.unityVector().multiply(this.friction));
 		if(this.velocity.length() < this.friction) {
 			this.velocity = new Vector(0,0);
@@ -225,6 +217,11 @@ CompoundBox.prototype = {
 	}
 	,__class__: CompoundBox
 };
+var Terrain = { __ename__ : true, __constructs__ : ["Grass","Road"] };
+Terrain.Grass = ["Grass",0];
+Terrain.Grass.__enum__ = Terrain;
+Terrain.Road = ["Road",1];
+Terrain.Road.__enum__ = Terrain;
 var Environment = function() {
 	this.objects = [];
 };
@@ -333,23 +330,27 @@ Main.main = function() {
 		}
 		return collidingObjects;
 	};
-	var gameLoop = function() {
-		var collidingObjects1 = getCollidingObjects(car1.position);
-		controlCar(car1,"ArrowUp","ArrowLeft","ArrowDown","ArrowRight");
-		controlCar(car2,"w","a","s","d");
-		var onRoad = false;
+	var getFriction = function(collidingObjects1) {
+		var friction = 0.048;
 		var _g2 = 0;
 		while(_g2 < collidingObjects1.length) {
 			var object1 = collidingObjects1[_g2];
 			++_g2;
 			if(js_Boot.__instanceof(object1,Road)) {
-				onRoad = true;
+				friction = 0.032;
 			}
 		}
-		if(!onRoad) {
-			car1.applyFriction();
-		}
-		car2.applyFriction();
+		return friction;
+	};
+	var gameLoop = function() {
+		controlCar(car1,"ArrowUp","ArrowLeft","ArrowDown","ArrowRight");
+		controlCar(car2,"w","a","s","d");
+		var gameLoop1 = getCollidingObjects(car1.position);
+		var gameLoop2 = getFriction(gameLoop1);
+		car1.applyFriction(gameLoop2);
+		var gameLoop3 = getCollidingObjects(car2.position);
+		var gameLoop4 = getFriction(gameLoop3);
+		car2.applyFriction(gameLoop4);
 		car1.updatePosition();
 		car2.updatePosition();
 		car1.color = "green";
@@ -367,8 +368,6 @@ Main.main = function() {
 	};
 	new haxe_Timer(30).run = gameLoop;
 };
-var _$Math_Math_$Impl_$ = function() { };
-_$Math_Math_$Impl_$.__name__ = true;
 Math.__name__ = true;
 var Road = function() {
 	CompoundBox.call(this);
