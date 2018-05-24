@@ -246,6 +246,7 @@ Terrain.Grass.__enum__ = Terrain;
 Terrain.Road = ["Road",1];
 Terrain.Road.__enum__ = Terrain;
 var Environment = function() {
+	this.startPositions = [];
 	this.objects = [];
 };
 Environment.__name__ = true;
@@ -260,6 +261,182 @@ Environment.prototype = {
 		}
 	}
 	,__class__: Environment
+};
+var Game = function(canvas,context,pressedKeys) {
+	this.environments = [];
+	this.cars = [];
+	this.pressedKeys = new haxe_ds_StringMap();
+	this.canvas = canvas;
+	this.context = context;
+	this.pressedKeys = pressedKeys;
+	var car = new Car();
+	car.color = "#800000";
+	car.name = "Car1";
+	car.nameColor = "black";
+	this.cars.push(car);
+	car = new Car();
+	car.color = "#434ea1";
+	car.name = "Car2";
+	car.nameColor = "black";
+	this.cars.push(car);
+	this.addEnvironments();
+	this.changeEnvironment(this.environments[0]);
+};
+Game.__name__ = true;
+Game.prototype = {
+	addEnvironments: function() {
+		var environment = new Environment();
+		environment.startPositions.push(new Vector(400,200));
+		environment.startPositions.push(new Vector(400,240));
+		environment.objects.push(Road.buildRoadCorner(new Vector(1275,220),1.5 * Math.PI));
+		environment.objects.push(Road.buildRoadCorner(new Vector(1275,525),0 * Math.PI));
+		environment.objects.push(Road.buildRoadCorner(new Vector(170,525),0.5 * Math.PI));
+		environment.objects.push(Road.buildRoadCorner(new Vector(170,220),Math.PI));
+		environment.objects.push(Road.buildRoad(new Vector(722.5,220),1005,0 * Math.PI));
+		environment.objects.push(Road.buildRoad(new Vector(1275,372.5),205,0.5 * Math.PI));
+		environment.objects.push(Road.buildRoad(new Vector(722.5,525),1005,0 * Math.PI));
+		environment.objects.push(Road.buildRoad(new Vector(170,372.5),205,0.5 * Math.PI));
+		environment.objects.push(new Checkpoint(new Vector(425,220),12,90,0 * Math.PI,0,false));
+		environment.objects.push(new Checkpoint(new Vector(722.5,220),12,90,0 * Math.PI,1,false));
+		environment.objects.push(new Checkpoint(new Vector(1275,372.5),12,90,0.5 * Math.PI,2,false));
+		environment.objects.push(new Checkpoint(new Vector(722.5,525),12,90,0 * Math.PI,3,false));
+		environment.objects.push(new Checkpoint(new Vector(170,372.5),12,90,0.5 * Math.PI,4,true));
+		this.environments.push(environment);
+		environment = new Environment();
+		environment.startPositions.push(new Vector(400,200));
+		environment.startPositions.push(new Vector(400,240));
+		environment.objects.push(Road.buildRoadCorner(new Vector(1275,220),1.5 * Math.PI));
+		environment.objects.push(Road.buildRoadCorner(new Vector(1275,525),0 * Math.PI));
+		environment.objects.push(Road.buildRoadCorner(new Vector(170,525),0.5 * Math.PI));
+		environment.objects.push(Road.buildRoadCorner(new Vector(170,220),Math.PI));
+		environment.objects.push(Road.buildRoad(new Vector(722.5,220),1005,0 * Math.PI));
+		environment.objects.push(Road.buildRoad(new Vector(1275,372.5),205,0.5 * Math.PI));
+		environment.objects.push(Road.buildRoad(new Vector(722.5,525),1005,0 * Math.PI));
+		environment.objects.push(Road.buildRoad(new Vector(170,372.5),205,0.5 * Math.PI));
+		environment.objects.push(new Checkpoint(new Vector(425,220),12,90,0 * Math.PI,0,false));
+		environment.objects.push(new Checkpoint(new Vector(722.5,220),12,90,0 * Math.PI,1,false));
+		environment.objects.push(new Checkpoint(new Vector(1275,372.5),12,90,0.5 * Math.PI,2,false));
+		environment.objects.push(new Checkpoint(new Vector(722.5,525),12,90,0 * Math.PI,3,false));
+		environment.objects.push(new Checkpoint(new Vector(170,372.5),12,90,0.5 * Math.PI,4,true));
+		this.environments.push(environment);
+	}
+	,changeEnvironment: function(environment) {
+		this.currentEnvironment = environment;
+		var _g = 0;
+		var _g1 = this.cars;
+		while(_g < _g1.length) {
+			var car = _g1[_g];
+			++_g;
+			car.lap = 0;
+			car.progress = 0;
+			car.velocity = new Vector(0,0);
+			car.position = this.currentEnvironment.startPositions[0];
+		}
+	}
+	,controlCar: function(car,up,left,down,right) {
+		var actions = [];
+		var _this = this.pressedKeys;
+		if(__map_reserved[up] != null ? _this.getReserved(up) : _this.h[up]) {
+			actions.push(CarAction.Forward);
+		}
+		var _this1 = this.pressedKeys;
+		if(__map_reserved[down] != null ? _this1.getReserved(down) : _this1.h[down]) {
+			actions.push(CarAction.Reverse);
+		}
+		var _this2 = this.pressedKeys;
+		if(__map_reserved[left] != null ? _this2.getReserved(left) : _this2.h[left]) {
+			actions.push(CarAction.Left);
+		}
+		var _this3 = this.pressedKeys;
+		if(__map_reserved[right] != null ? _this3.getReserved(right) : _this3.h[right]) {
+			actions.push(CarAction.Right);
+		}
+		car.controlInput(actions);
+	}
+	,calculateScaleFactor: function() {
+		var carDistance = this.cars[0].position.subtract(this.cars[1].position);
+		var scaleFactor = 1.0;
+		var scaleHorisontal = 1.0;
+		var scaleVertical = 1.0;
+		if(Math.abs(carDistance.y) >= this.canvas.height - 50) {
+			scaleVertical = (this.canvas.height - 50) / Math.abs(carDistance.y);
+		}
+		if(Math.abs(carDistance.x) >= this.canvas.width - 50) {
+			scaleHorisontal = (this.canvas.width - 50) / Math.abs(carDistance.x);
+		}
+		scaleFactor = Math.min(scaleHorisontal,scaleVertical);
+		return scaleFactor;
+	}
+	,getCollidingObjects: function(point) {
+		var collidingObjects = [];
+		var _g = 0;
+		var _g1 = this.currentEnvironment.objects;
+		while(_g < _g1.length) {
+			var object = _g1[_g];
+			++_g;
+			if(js_Boot.__instanceof(object,Collidable)) {
+				if(Collision.collidesWith(point,js_Boot.__cast(object , Collidable))) {
+					collidingObjects.push(object);
+				}
+			}
+		}
+		return collidingObjects;
+	}
+	,handleRoadCollision: function(car) {
+		car.frictionFactor = 0.032;
+	}
+	,handleCheckpointCollision: function(car,checkpoint) {
+		if(checkpoint.number == car.progress && checkpoint.last) {
+			car.progress = 0;
+		} else if(checkpoint.number == car.progress) {
+			car.progress += 1;
+			if(car.progress == 1) {
+				car.lap += 1;
+			}
+		}
+	}
+	,handleCollisions: function(car) {
+		var _g = 0;
+		var _g1 = this.getCollidingObjects(car.position);
+		while(_g < _g1.length) {
+			var object = _g1[_g];
+			++_g;
+			if(js_Boot.__instanceof(object,Checkpoint)) {
+				this.handleCheckpointCollision(car,js_Boot.__cast(object , Checkpoint));
+			}
+			if(js_Boot.__instanceof(object,Road)) {
+				this.handleRoadCollision(car);
+			}
+		}
+	}
+	,processCar: function(car,up,left,down,right) {
+		this.controlCar(car,up,left,down,right);
+		car.frictionFactor = 0.048;
+		this.handleCollisions(car);
+		car.applyFriction();
+		car.updatePosition();
+	}
+	,gameLoop: function() {
+		this.processCar(this.cars[0],"ArrowUp","ArrowLeft","ArrowDown","ArrowRight");
+		this.processCar(this.cars[1],"w","a","s","d");
+		this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
+		this.context.save();
+		var scaleFactor = this.calculateScaleFactor();
+		var focusPoint = this.cars[0].position.add(this.cars[1].position).divide(2 / scaleFactor);
+		var midPoint = new Vector(0.5 * this.canvas.width,0.5 * this.canvas.height);
+		this.context.translate(midPoint.x - focusPoint.x,midPoint.y - focusPoint.y);
+		this.context.scale(scaleFactor,scaleFactor);
+		this.currentEnvironment.draw(this.context);
+		var _g = 0;
+		var _g1 = this.cars;
+		while(_g < _g1.length) {
+			var car = _g1[_g];
+			++_g;
+			car.draw(this.context);
+		}
+		this.context.restore();
+	}
+	,__class__: Game
 };
 var Main = function() { };
 Main.__name__ = true;
@@ -276,30 +453,6 @@ Main.main = function() {
 		canvas.height = window.innerHeight;
 	};
 	var pressedKeys = new haxe_ds_StringMap();
-	var car1 = new Car();
-	var car2 = new Car();
-	car1.color = "#800000";
-	car2.color = "#434ea1";
-	car1.name = "Bjørn";
-	car2.name = "Lundin";
-	car1.nameColor = "black";
-	car2.nameColor = "black";
-	car1.position = new Vector(400,200);
-	car2.position = new Vector(400,240);
-	var environment = new Environment();
-	environment.objects.push(Road.buildRoadCorner(new Vector(1275,220),1.5 * Math.PI));
-	environment.objects.push(Road.buildRoadCorner(new Vector(1275,525),0 * Math.PI));
-	environment.objects.push(Road.buildRoadCorner(new Vector(170,525),0.5 * Math.PI));
-	environment.objects.push(Road.buildRoadCorner(new Vector(170,220),Math.PI));
-	environment.objects.push(Road.buildRoad(new Vector(722.5,220),1005,0 * Math.PI));
-	environment.objects.push(Road.buildRoad(new Vector(1275,372.5),205,0.5 * Math.PI));
-	environment.objects.push(Road.buildRoad(new Vector(722.5,525),1005,0 * Math.PI));
-	environment.objects.push(Road.buildRoad(new Vector(170,372.5),205,0.5 * Math.PI));
-	environment.objects.push(new Checkpoint(new Vector(425,220),12,90,0 * Math.PI,0,false));
-	environment.objects.push(new Checkpoint(new Vector(722.5,220),12,90,0 * Math.PI,1,false));
-	environment.objects.push(new Checkpoint(new Vector(1275,372.5),12,90,0.5 * Math.PI,2,false));
-	environment.objects.push(new Checkpoint(new Vector(722.5,525),12,90,0 * Math.PI,3,false));
-	environment.objects.push(new Checkpoint(new Vector(170,372.5),12,90,0.5 * Math.PI,4,true));
 	window.addEventListener("keyup",function(event) {
 		var k = event.key;
 		if(__map_reserved[k] != null) {
@@ -316,101 +469,8 @@ Main.main = function() {
 			pressedKeys.h[k1] = true;
 		}
 	});
-	var controlCar = function(car,up,left,down,right) {
-		var actions = [];
-		if(__map_reserved[up] != null ? pressedKeys.getReserved(up) : pressedKeys.h[up]) {
-			actions.push(CarAction.Forward);
-		}
-		if(__map_reserved[down] != null ? pressedKeys.getReserved(down) : pressedKeys.h[down]) {
-			actions.push(CarAction.Reverse);
-		}
-		if(__map_reserved[left] != null ? pressedKeys.getReserved(left) : pressedKeys.h[left]) {
-			actions.push(CarAction.Left);
-		}
-		if(__map_reserved[right] != null ? pressedKeys.getReserved(right) : pressedKeys.h[right]) {
-			actions.push(CarAction.Right);
-		}
-		car.controlInput(actions);
-	};
-	var calculateScaleFactor = function() {
-		var carDistance = car1.position.subtract(car2.position);
-		var scaleFactor = 1.0;
-		var scaleHorisontal = 1.0;
-		var scaleVertical = 1.0;
-		if(Math.abs(carDistance.y) >= canvas.height - 50) {
-			scaleVertical = (canvas.height - 50) / Math.abs(carDistance.y);
-		}
-		if(Math.abs(carDistance.x) >= canvas.width - 50) {
-			scaleHorisontal = (canvas.width - 50) / Math.abs(carDistance.x);
-		}
-		scaleFactor = Math.min(scaleHorisontal,scaleVertical);
-		return scaleFactor;
-	};
-	var getCollidingObjects = function(point) {
-		var collidingObjects = [];
-		var _g = 0;
-		var _g1 = environment.objects;
-		while(_g < _g1.length) {
-			var object = _g1[_g];
-			++_g;
-			if(js_Boot.__instanceof(object,Collidable)) {
-				if(Collision.collidesWith(point,js_Boot.__cast(object , Collidable))) {
-					collidingObjects.push(object);
-				}
-			}
-		}
-		return collidingObjects;
-	};
-	var handleRoadCollision = function(car3) {
-		car3.frictionFactor = 0.032;
-	};
-	var handleCheckpointCollision = function(car4,checkpoint) {
-		if(checkpoint.number == car4.progress && checkpoint.last) {
-			car4.progress = 0;
-		} else if(checkpoint.number == car4.progress) {
-			car4.progress += 1;
-			if(car4.progress == 1) {
-				car4.lap += 1;
-			}
-		}
-	};
-	var handleCollisions = function(car5) {
-		var _g2 = 0;
-		var _g11 = getCollidingObjects(car5.position);
-		while(_g2 < _g11.length) {
-			var object1 = _g11[_g2];
-			++_g2;
-			if(js_Boot.__instanceof(object1,Checkpoint)) {
-				handleCheckpointCollision(car5,js_Boot.__cast(object1 , Checkpoint));
-			}
-			if(js_Boot.__instanceof(object1,Road)) {
-				handleRoadCollision(car5);
-			}
-		}
-	};
-	var processCar = function(car6,up1,left1,down1,right1) {
-		controlCar(car6,up1,left1,down1,right1);
-		car6.frictionFactor = 0.048;
-		handleCollisions(car6);
-		car6.applyFriction();
-		car6.updatePosition();
-	};
-	var gameLoop = function() {
-		processCar(car1,"ArrowUp","ArrowLeft","ArrowDown","ArrowRight");
-		processCar(car2,"w","a","s","d");
-		context.clearRect(0,0,canvas.width,canvas.height);
-		context.save();
-		var scaleFactor1 = calculateScaleFactor();
-		var focusPoint = car1.position.add(car2.position).divide(2 / scaleFactor1);
-		var midPoint = new Vector(0.5 * canvas.width,0.5 * canvas.height);
-		context.translate(midPoint.x - focusPoint.x,midPoint.y - focusPoint.y);
-		context.scale(scaleFactor1,scaleFactor1);
-		environment.draw(context);
-		car1.draw(context);
-		car2.draw(context);
-		context.restore();
-	};
-	new haxe_Timer(30).run = gameLoop;
+	var game = new Game(canvas,context,pressedKeys);
+	new haxe_Timer(30).run = $bind(game,game.gameLoop);
 };
 Math.__name__ = true;
 var Road = function() {
@@ -769,6 +829,8 @@ js_Boot.__isNativeObj = function(o) {
 js_Boot.__resolveNativeClass = function(name) {
 	return $global[name];
 };
+var $_, $fid = 0;
+function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
 String.prototype.__class__ = String;
 String.__name__ = true;
 Array.__name__ = true;

@@ -2,6 +2,7 @@ enum Terrain {Grass; Road;}
 
 class Environment {
     public var objects: Array<Drawable> = [];
+    public var startPositions: Array<Vector> = [];
 
     public function new() {}
 
