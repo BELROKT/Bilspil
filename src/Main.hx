@@ -20,8 +20,8 @@ class Main {
         var car2 = new Car();
         car1.color = "#800000";
         car2.color = "#434ea1";
-        car1.name = "Bjørn";
-        car2.name = "Lundin";
+        car1.name = "Car1";
+        car2.name = "Car2";
         car1.nameColor = "black";
         car2.nameColor = "black";
         car1.position = new Vector(400, 200);
@@ -35,7 +35,11 @@ class Main {
         environment.objects.push(Road.buildRoad(new Vector(1275, 372.5), 205, 0.5*Math.PI));
         environment.objects.push(Road.buildRoad(new Vector(722.5, 525), 1005, 0*Math.PI));
         environment.objects.push(Road.buildRoad(new Vector(170, 372.5), 205, 0.5*Math.PI));
-        environment.objects.push(new Box(new Vector(425, 220), 4, 90, 0*Math.PI, "yellow"));
+        environment.objects.push(new Checkpoint(new Vector(425, 220), 12, 90, 0*Math.PI, 0, false));
+        environment.objects.push(new Checkpoint(new Vector(722.5, 220), 12, 90, 0*Math.PI, 1, false));
+        environment.objects.push(new Checkpoint(new Vector(1275, 372.5), 12, 90, 0.5*Math.PI, 2, false));
+        environment.objects.push(new Checkpoint(new Vector(722.5, 525), 12, 90, 0*Math.PI, 3, false));
+        environment.objects.push(new Checkpoint(new Vector(170, 372.5), 12, 90, 0.5*Math.PI, 4, true));
 
         Browser.window.addEventListener("keyup", function (event) {
             pressedKeys[event.key] = false;
@@ -91,23 +95,44 @@ class Main {
             return collidingObjects;
         }
 
-        function getFriction(collidingObjects: Array<Dynamic>) {
-            var friction = 0.048;
-            for(object in collidingObjects) {
-                if(Std.is(object, Road)) {
-                    friction = 0.032;
+        function handleRoadCollision(car: Car) {
+            car.frictionFactor = 0.032;
+        }
+
+        function handleCheckpointCollision(car: Car, checkpoint: Checkpoint) {
+            if (checkpoint.number == car.progress && checkpoint.last) {
+                car.progress = 0;
+            }
+            else if (checkpoint.number == car.progress) {
+                car.progress += 1;
+                if (car.progress == 1) {
+                    car.lap += 1;
                 }
             }
-            return friction;
+        }
+
+        function handleCollisions(car: Car) {
+            for(object in getCollidingObjects(car.position)) {
+                if(Std.is(object, Checkpoint)) {
+                    handleCheckpointCollision(car, cast(object, Checkpoint));
+                }
+                if(Std.is(object, Road)) {
+                    handleRoadCollision(car);
+                }
+            }
+        }
+
+        function processCar(car: Car, up: String, left: String, down: String, right: String) {
+            controlCar(car, up, left, down, right);
+            car.frictionFactor = 0.048;
+            handleCollisions(car);
+            car.applyFriction();
+            car.updatePosition();
         }
 
         function gameLoop() {
-            controlCar(car1, "ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight");
-            controlCar(car2, "w", "a", "s", "d");
-            car1.applyFriction(getFriction(getCollidingObjects(car1.position)));
-            car2.applyFriction(getFriction(getCollidingObjects(car2.position)));
-            car1.updatePosition();
-            car2.updatePosition();
+            processCar(car1, "ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight");
+            processCar(car2, "w", "a", "s", "d");
             context.clearRect(0, 0, canvas.width, canvas.height);
             context.save();
             var scaleFactor = calculateScaleFactor();

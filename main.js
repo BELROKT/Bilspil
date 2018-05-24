@@ -54,10 +54,12 @@ CarAction.Right.__enum__ = CarAction;
 CarAction.Left = ["Left",3];
 CarAction.Left.__enum__ = CarAction;
 var Car = function() {
+	this.progress = 0;
+	this.lap = 0;
 	this.nameColor = "";
 	this.name = "";
 	this.color = "";
-	this.friction = 0.0;
+	this.frictionFactor = 0.048;
 	this.turnAngle = 0.0;
 	this.turnSpeed = 0.01;
 	this.reverseAcceleration = 0.3;
@@ -88,7 +90,7 @@ Car.prototype = {
 		context.font = "16px Arial";
 		context.textAlign = "center";
 		context.textBaseline = "middle";
-		context.fillText(this.name,0,1,38);
+		context.fillText(Std.string(this.lap),0,1,38);
 		context.restore();
 	}
 	,drawWheel: function(context,x,y,angle) {
@@ -150,12 +152,12 @@ Car.prototype = {
 		}
 		this.velocity = Vector.fromAngle(this.angle).multiply(relativeVelocity.x);
 	}
-	,applyFriction: function(frictionFactor) {
-		this.friction = this.velocity.length() * frictionFactor;
-		this.forwardAcceleration = this.baseForwardAcceleration - this.friction;
-		this.reverseAcceleration = this.baseReverseAcceleration - this.friction;
-		this.velocity = this.velocity.subtract(this.velocity.unityVector().multiply(this.friction));
-		if(this.velocity.length() < this.friction) {
+	,applyFriction: function() {
+		var friction = this.velocity.length() * this.frictionFactor;
+		this.forwardAcceleration = this.baseForwardAcceleration - friction;
+		this.reverseAcceleration = this.baseReverseAcceleration - friction;
+		this.velocity = this.velocity.subtract(this.velocity.unityVector().multiply(friction));
+		if(this.velocity.length() < friction) {
 			this.velocity = new Vector(0,0);
 		}
 	}
@@ -179,6 +181,20 @@ Car.prototype = {
 	}
 	,__class__: Car
 };
+var Checkpoint = function(position,width,height,angle,number,last) {
+	this.last = false;
+	Box.call(this,position,width,height,angle,"#0c9b7c");
+	this.number = number;
+	this.last = last;
+	if(number == 0) {
+		this.color = "yellow";
+	}
+};
+Checkpoint.__name__ = true;
+Checkpoint.__super__ = Box;
+Checkpoint.prototype = $extend(Box.prototype,{
+	__class__: Checkpoint
+});
 var Collision = function() { };
 Collision.__name__ = true;
 Collision.collidesWith = function(point,collider) {
@@ -279,7 +295,11 @@ Main.main = function() {
 	environment.objects.push(Road.buildRoad(new Vector(1275,372.5),205,0.5 * Math.PI));
 	environment.objects.push(Road.buildRoad(new Vector(722.5,525),1005,0 * Math.PI));
 	environment.objects.push(Road.buildRoad(new Vector(170,372.5),205,0.5 * Math.PI));
-	environment.objects.push(new Box(new Vector(425,220),4,90,0 * Math.PI,"yellow"));
+	environment.objects.push(new Checkpoint(new Vector(425,220),12,90,0 * Math.PI,0,false));
+	environment.objects.push(new Checkpoint(new Vector(722.5,220),12,90,0 * Math.PI,1,false));
+	environment.objects.push(new Checkpoint(new Vector(1275,372.5),12,90,0.5 * Math.PI,2,false));
+	environment.objects.push(new Checkpoint(new Vector(722.5,525),12,90,0 * Math.PI,3,false));
+	environment.objects.push(new Checkpoint(new Vector(170,372.5),12,90,0.5 * Math.PI,4,true));
 	window.addEventListener("keyup",function(event) {
 		var k = event.key;
 		if(__map_reserved[k] != null) {
@@ -341,29 +361,43 @@ Main.main = function() {
 		}
 		return collidingObjects;
 	};
-	var getFriction = function(collidingObjects1) {
-		var friction = 0.048;
-		var _g2 = 0;
-		while(_g2 < collidingObjects1.length) {
-			var object1 = collidingObjects1[_g2];
-			++_g2;
-			if(js_Boot.__instanceof(object1,Road)) {
-				friction = 0.032;
+	var handleRoadCollision = function(car3) {
+		car3.frictionFactor = 0.032;
+	};
+	var handleCheckpointCollision = function(car4,checkpoint) {
+		if(checkpoint.number == car4.progress && checkpoint.last) {
+			car4.progress = 0;
+		} else if(checkpoint.number == car4.progress) {
+			car4.progress += 1;
+			if(car4.progress == 1) {
+				car4.lap += 1;
 			}
 		}
-		return friction;
+	};
+	var handleCollisions = function(car5) {
+		var _g2 = 0;
+		var _g11 = getCollidingObjects(car5.position);
+		while(_g2 < _g11.length) {
+			var object1 = _g11[_g2];
+			++_g2;
+			if(js_Boot.__instanceof(object1,Checkpoint)) {
+				handleCheckpointCollision(car5,js_Boot.__cast(object1 , Checkpoint));
+			}
+			if(js_Boot.__instanceof(object1,Road)) {
+				handleRoadCollision(car5);
+			}
+		}
+	};
+	var processCar = function(car6,up1,left1,down1,right1) {
+		controlCar(car6,up1,left1,down1,right1);
+		car6.frictionFactor = 0.048;
+		handleCollisions(car6);
+		car6.applyFriction();
+		car6.updatePosition();
 	};
 	var gameLoop = function() {
-		controlCar(car1,"ArrowUp","ArrowLeft","ArrowDown","ArrowRight");
-		controlCar(car2,"w","a","s","d");
-		var gameLoop1 = getCollidingObjects(car1.position);
-		var gameLoop2 = getFriction(gameLoop1);
-		car1.applyFriction(gameLoop2);
-		var gameLoop3 = getCollidingObjects(car2.position);
-		var gameLoop4 = getFriction(gameLoop3);
-		car2.applyFriction(gameLoop4);
-		car1.updatePosition();
-		car2.updatePosition();
+		processCar(car1,"ArrowUp","ArrowLeft","ArrowDown","ArrowRight");
+		processCar(car2,"w","a","s","d");
 		context.clearRect(0,0,canvas.width,canvas.height);
 		context.save();
 		var scaleFactor1 = calculateScaleFactor();

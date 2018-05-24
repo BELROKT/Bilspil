@@ -14,10 +14,12 @@ class Car {
     public var reverseAcceleration = 0.3;
     public var turnSpeed = 0.01;
     public var turnAngle = 0.0;
-    public var friction = 0.0;
+    public var frictionFactor = 0.048;
     public var color = "";
     public var name = "";
     public var nameColor = "";
+    public var lap = 0;
+    public var progress = 0;
 
     public function new() {}
 
@@ -35,7 +37,7 @@ class Car {
         context.font = "16px Arial";
         context.textAlign = "center";
         context.textBaseline = "middle";
-        context.fillText(name, 0, 1, 38);
+        context.fillText(Std.string(lap), 0, 1, 38);
         context.restore();
     }
 
@@ -107,8 +109,8 @@ class Car {
         velocity = Vector.fromAngle(angle).multiply(relativeVelocity.x);
     }
 
-    public function applyFriction(frictionFactor: Float) {
-        friction = velocity.length() * frictionFactor;
+    public function applyFriction() {
+        var friction = velocity.length() * frictionFactor;
         forwardAcceleration = baseForwardAcceleration - friction;
         reverseAcceleration = baseReverseAcceleration - friction;
         
