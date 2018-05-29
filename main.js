@@ -286,42 +286,53 @@ Game.__name__ = true;
 Game.prototype = {
 	addEnvironments: function() {
 		var environment = new Environment();
-		environment.startPositions.push(new Vector(400,200));
-		environment.startPositions.push(new Vector(400,240));
-		environment.objects.push(Road.buildRoadCorner(new Vector(1275,220),1.5 * Math.PI));
-		environment.objects.push(Road.buildRoadCorner(new Vector(1275,525),0 * Math.PI));
-		environment.objects.push(Road.buildRoadCorner(new Vector(170,525),0.5 * Math.PI));
-		environment.objects.push(Road.buildRoadCorner(new Vector(170,220),Math.PI));
-		environment.objects.push(Road.buildRoad(new Vector(722.5,220),1005,0 * Math.PI));
-		environment.objects.push(Road.buildRoad(new Vector(1275,372.5),205,0.5 * Math.PI));
-		environment.objects.push(Road.buildRoad(new Vector(722.5,525),1005,0 * Math.PI));
-		environment.objects.push(Road.buildRoad(new Vector(170,372.5),205,0.5 * Math.PI));
-		environment.objects.push(new Checkpoint(new Vector(425,220),12,90,0 * Math.PI,0,false));
-		environment.objects.push(new Checkpoint(new Vector(722.5,220),12,90,0 * Math.PI,1,false));
-		environment.objects.push(new Checkpoint(new Vector(1275,372.5),12,90,0.5 * Math.PI,2,false));
-		environment.objects.push(new Checkpoint(new Vector(722.5,525),12,90,0 * Math.PI,3,false));
-		environment.objects.push(new Checkpoint(new Vector(170,372.5),12,90,0.5 * Math.PI,4,true));
+		environment.startPositions.push(new Vector(-24,-20));
+		environment.startPositions.push(new Vector(-24,20));
+		environment.objects.push(Road.buildRoad(new Vector(0,0),1000,0 * Math.PI));
+		environment.objects.push(Road.buildRoad(new Vector(550,150),200,0.5 * Math.PI));
+		environment.objects.push(Road.buildRoad(new Vector(0,300),1000,0 * Math.PI));
+		environment.objects.push(Road.buildRoad(new Vector(-550,150),200,0.5 * Math.PI));
+		environment.objects.push(Road.buildRoadCorner(new Vector(550,0),1.5 * Math.PI));
+		environment.objects.push(Road.buildRoadCorner(new Vector(550,300),0 * Math.PI));
+		environment.objects.push(Road.buildRoadCorner(new Vector(-550,300),0.5 * Math.PI));
+		environment.objects.push(Road.buildRoadCorner(new Vector(-550,0),Math.PI));
+		environment.objects.push(new Checkpoint(new Vector(0,0),12,90,0 * Math.PI,0,false));
+		environment.objects.push(new Checkpoint(new Vector(450,0),12,90,0 * Math.PI,1,false));
+		environment.objects.push(new Checkpoint(new Vector(450,300),12,90,0 * Math.PI,2,false));
+		environment.objects.push(new Checkpoint(new Vector(-450,300),12,90,0 * Math.PI,3,false));
+		environment.objects.push(new Checkpoint(new Vector(-450,0),12,90,0 * Math.PI,4,true));
 		this.environments.push(environment);
 		environment = new Environment();
-		environment.startPositions.push(new Vector(400,200));
-		environment.startPositions.push(new Vector(400,240));
-		environment.objects.push(Road.buildRoadCorner(new Vector(1275,220),1.5 * Math.PI));
-		environment.objects.push(Road.buildRoadCorner(new Vector(1275,525),0 * Math.PI));
-		environment.objects.push(Road.buildRoadCorner(new Vector(170,525),0.5 * Math.PI));
-		environment.objects.push(Road.buildRoadCorner(new Vector(170,220),Math.PI));
-		environment.objects.push(Road.buildRoad(new Vector(722.5,220),1005,0 * Math.PI));
-		environment.objects.push(Road.buildRoad(new Vector(1275,372.5),205,0.5 * Math.PI));
-		environment.objects.push(Road.buildRoad(new Vector(722.5,525),1005,0 * Math.PI));
-		environment.objects.push(Road.buildRoad(new Vector(170,372.5),205,0.5 * Math.PI));
-		environment.objects.push(new Checkpoint(new Vector(425,220),12,90,0 * Math.PI,0,false));
-		environment.objects.push(new Checkpoint(new Vector(722.5,220),12,90,0 * Math.PI,1,false));
-		environment.objects.push(new Checkpoint(new Vector(1275,372.5),12,90,0.5 * Math.PI,2,false));
-		environment.objects.push(new Checkpoint(new Vector(722.5,525),12,90,0 * Math.PI,3,false));
-		environment.objects.push(new Checkpoint(new Vector(170,372.5),12,90,0.5 * Math.PI,4,true));
+		environment.startPositions.push(new Vector(-24,-20));
+		environment.startPositions.push(new Vector(-24,20));
+		environment.objects.push(Road.buildRoad(new Vector(0,0),600,0 * Math.PI));
+		environment.objects.push(Road.buildRoad(new Vector(350,350),600,0.5 * Math.PI));
+		environment.objects.push(Road.buildRoad(new Vector(0,700),600,0 * Math.PI));
+		environment.objects.push(Road.buildRoad(new Vector(-350,350),600,0.5 * Math.PI));
+		environment.objects.push(Road.buildRoad(new Vector(-350,-350),600,0.5 * Math.PI));
+		environment.objects.push(Road.buildRoad(new Vector(-700,-700),600,0 * Math.PI));
+		environment.objects.push(Road.buildRoad(new Vector(-1050,-350),600,0.5 * Math.PI));
+		environment.objects.push(Road.buildRoad(new Vector(-700,0),600,0 * Math.PI));
+		environment.objects.push(Road.buildRoadCorner(new Vector(350,0),1.5 * Math.PI));
+		environment.objects.push(Road.buildRoadCorner(new Vector(350,700),0 * Math.PI));
+		environment.objects.push(Road.buildRoadCorner(new Vector(-350,700),0.5 * Math.PI));
+		environment.objects.push(Road.buildRoadCorner(new Vector(-350,-700),1.5 * Math.PI));
+		environment.objects.push(Road.buildRoadCorner(new Vector(-1050,-700),Math.PI));
+		environment.objects.push(Road.buildRoadCorner(new Vector(-1050,0),0.5 * Math.PI));
+		environment.objects.push(Road.buildCrossroads(new Vector(-350,0),0 * Math.PI));
+		environment.objects.push(new Checkpoint(new Vector(0,0),12,90,0 * Math.PI,0,false));
+		environment.objects.push(new Checkpoint(new Vector(350,350),12,90,0.5 * Math.PI,1,false));
+		environment.objects.push(new Checkpoint(new Vector(0,700),12,90,0 * Math.PI,2,false));
+		environment.objects.push(new Checkpoint(new Vector(-350,350),12,90,0.5 * Math.PI,3,false));
+		environment.objects.push(new Checkpoint(new Vector(-350,-350),12,90,0.5 * Math.PI,4,false));
+		environment.objects.push(new Checkpoint(new Vector(-700,-700),12,90,0 * Math.PI,5,false));
+		environment.objects.push(new Checkpoint(new Vector(-1050,-350),12,90,0.5 * Math.PI,6,false));
+		environment.objects.push(new Checkpoint(new Vector(-700,0),12,90,0 * Math.PI,7,true));
 		this.environments.push(environment);
 	}
 	,changeEnvironment: function(environment) {
 		this.currentEnvironment = environment;
+		var n = 0;
 		var _g = 0;
 		var _g1 = this.cars;
 		while(_g < _g1.length) {
@@ -330,7 +341,12 @@ Game.prototype = {
 			car.lap = 0;
 			car.progress = 0;
 			car.velocity = new Vector(0,0);
-			car.position = this.currentEnvironment.startPositions[0];
+			car.position = this.currentEnvironment.startPositions[n];
+			car.angle = 0;
+			++n;
+			if(n >= this.currentEnvironment.startPositions.length) {
+				n = 0;
+			}
 		}
 	}
 	,controlCar: function(car,up,left,down,right) {
@@ -441,6 +457,7 @@ Game.prototype = {
 var Main = function() { };
 Main.__name__ = true;
 Main.main = function() {
+	var menuScreen = new MenuScreen();
 	var canvas = window.document.createElement("canvas");
 	var context = canvas.getContext("2d",null);
 	context.fillRect(345,5,657,123);
@@ -469,10 +486,64 @@ Main.main = function() {
 			pressedKeys.h[k1] = true;
 		}
 	});
+	window.addEventListener("keypress",function(event2) {
+		if(event2.key == "Escape") {
+			menuScreen.show();
+		}
+	});
 	var game = new Game(canvas,context,pressedKeys);
+	menuScreen.addButton("Map 1",function() {
+		game.changeEnvironment(game.environments[0]);
+		menuScreen.hide();
+	});
+	menuScreen.addButton("Map 2",function() {
+		game.changeEnvironment(game.environments[1]);
+		menuScreen.hide();
+	});
 	new haxe_Timer(30).run = $bind(game,game.gameLoop);
 };
 Math.__name__ = true;
+var MenuScreen = function() {
+	this.root = window.document.createElement("div");
+	var _gthis = this;
+	window.document.body.appendChild(this.root);
+	this.root.style.position = "absolute";
+	this.root.style.width = "100vw";
+	this.root.style.height = "100vh";
+	this.root.style.backgroundColor = "#654321";
+	this.root.style.display = "";
+	var title = window.document.createElement("div");
+	title.innerText = "BILSPILLET";
+	title.style.textAlign = "center";
+	title.style.fontSize = "64px";
+	title.style.fontWeight = "bold";
+	title.style.marginTop = "10vh";
+	this.root.appendChild(title);
+	this.addButton("Start spil",function() {
+		if(_gthis.root.style.display == "") {
+			_gthis.hide();
+		}
+	});
+};
+MenuScreen.__name__ = true;
+MenuScreen.prototype = {
+	show: function() {
+		this.root.style.display = "";
+	}
+	,hide: function() {
+		this.root.style.display = "none";
+	}
+	,addButton: function(title,callback) {
+		var button = window.document.createElement("button");
+		button.innerText = title;
+		button.onclick = callback;
+		button.style.padding = "4px";
+		button.style.margin = "8px";
+		button.style.backgroundColor = "#606665";
+		this.root.appendChild(button);
+	}
+	,__class__: MenuScreen
+};
 var Road = function() {
 	CompoundBox.call(this);
 };
@@ -502,6 +573,24 @@ Road.buildRoadCorner = function(position,angle,length,width) {
 	road.boxList.push(new Box(new Vector(0,0),length,width,0,"#505554"));
 	road.boxList.push(new Box(new Vector(-2.5,-2.5),length - 5,width - 5,0,"#606665"));
 	road.boxList.push(new Box(new Vector(-0.5 * length + 2.5,-0.5 * width + 2.5),5,5,0,"#505554"));
+	road.addCollisionBox(new Box(new Vector(0,0),length,width,0,"#505554"));
+	return road;
+};
+Road.buildCrossroads = function(position,angle,length,width) {
+	if(width == null) {
+		width = 100.0;
+	}
+	if(length == null) {
+		length = 100.0;
+	}
+	var road = new Road();
+	road.position = position;
+	road.angle = angle;
+	road.boxList.push(new Box(new Vector(0,0),length,width,0,"#606665"));
+	road.boxList.push(new Box(new Vector(0.5 * length - 2.5,0.5 * width - 2.5),5,5,0,"#505554"));
+	road.boxList.push(new Box(new Vector(0.5 * length - 2.5,-0.5 * width + 2.5),5,5,0,"#505554"));
+	road.boxList.push(new Box(new Vector(-0.5 * length + 2.5,-0.5 * width + 2.5),5,5,0,"#505554"));
+	road.boxList.push(new Box(new Vector(-0.5 * length + 2.5,0.5 * width - 2.5),5,5,0,"#505554"));
 	road.addCollisionBox(new Box(new Vector(0,0),length,width,0,"#505554"));
 	return road;
 };

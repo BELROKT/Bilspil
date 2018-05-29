@@ -4,7 +4,7 @@ class Game {
     var pressedKeys = new Map<String, Bool>();
 
     var cars: Array<Car> = [];
-    var environments: Array<Environment> = [];
+    public var environments: Array<Environment> = [];
     var currentEnvironment: Environment;
 
     public function new(canvas: js.html.CanvasElement, context: js.html.CanvasRenderingContext2D, pressedKeys: Map<String, Bool>) {
@@ -28,49 +28,65 @@ class Game {
 
     function addEnvironments() {
         var environment = new Environment();
-        environment.startPositions.push(new Vector(400, 200));
-        environment.startPositions.push(new Vector(400, 240));
-        environment.objects.push(Road.buildRoadCorner(new Vector(1275, 220), 1.5*Math.PI));
-        environment.objects.push(Road.buildRoadCorner(new Vector(1275, 525), 0*Math.PI));
-        environment.objects.push(Road.buildRoadCorner(new Vector(170, 525), 0.5*Math.PI));
-        environment.objects.push(Road.buildRoadCorner(new Vector(170, 220), 1*Math.PI));
-        environment.objects.push(Road.buildRoad(new Vector(722.5, 220), 1005, 0*Math.PI));
-        environment.objects.push(Road.buildRoad(new Vector(1275, 372.5), 205, 0.5*Math.PI));
-        environment.objects.push(Road.buildRoad(new Vector(722.5, 525), 1005, 0*Math.PI));
-        environment.objects.push(Road.buildRoad(new Vector(170, 372.5), 205, 0.5*Math.PI));
-        environment.objects.push(new Checkpoint(new Vector(425, 220), 12, 90, 0*Math.PI, 0, false));
-        environment.objects.push(new Checkpoint(new Vector(722.5, 220), 12, 90, 0*Math.PI, 1, false));
-        environment.objects.push(new Checkpoint(new Vector(1275, 372.5), 12, 90, 0.5*Math.PI, 2, false));
-        environment.objects.push(new Checkpoint(new Vector(722.5, 525), 12, 90, 0*Math.PI, 3, false));
-        environment.objects.push(new Checkpoint(new Vector(170, 372.5), 12, 90, 0.5*Math.PI, 4, true));
+        environment.startPositions.push(new Vector(-24, -20));
+        environment.startPositions.push(new Vector(-24, 20));
+        environment.objects.push(Road.buildRoad(new Vector(0, 0), 1000, 0*Math.PI));
+        environment.objects.push(Road.buildRoad(new Vector(550, 150), 200, 0.5*Math.PI));
+        environment.objects.push(Road.buildRoad(new Vector(0, 300), 1000, 0*Math.PI));
+        environment.objects.push(Road.buildRoad(new Vector(-550, 150), 200, 0.5*Math.PI));
+        environment.objects.push(Road.buildRoadCorner(new Vector(550, 0), 1.5*Math.PI));
+        environment.objects.push(Road.buildRoadCorner(new Vector(550, 300), 0*Math.PI));
+        environment.objects.push(Road.buildRoadCorner(new Vector(-550, 300), 0.5*Math.PI));
+        environment.objects.push(Road.buildRoadCorner(new Vector(-550, 0), 1*Math.PI));
+        environment.objects.push(new Checkpoint(new Vector(0, 0), 12, 90, 0*Math.PI, 0, false));
+        environment.objects.push(new Checkpoint(new Vector(450, 0), 12, 90, 0*Math.PI, 1, false));
+        environment.objects.push(new Checkpoint(new Vector(450, 300), 12, 90, 0*Math.PI, 2, false));
+        environment.objects.push(new Checkpoint(new Vector(-450, 300), 12, 90, 0*Math.PI, 3, false));
+        environment.objects.push(new Checkpoint(new Vector(-450, 0), 12, 90, 0*Math.PI, 4, true));
         environments.push(environment);
 
         environment = new Environment();
-        environment.startPositions.push(new Vector(400, 200));
-        environment.startPositions.push(new Vector(400, 240));
-        environment.objects.push(Road.buildRoadCorner(new Vector(1275, 220), 1.5*Math.PI));
-        environment.objects.push(Road.buildRoadCorner(new Vector(1275, 525), 0*Math.PI));
-        environment.objects.push(Road.buildRoadCorner(new Vector(170, 525), 0.5*Math.PI));
-        environment.objects.push(Road.buildRoadCorner(new Vector(170, 220), 1*Math.PI));
-        environment.objects.push(Road.buildRoad(new Vector(722.5, 220), 1005, 0*Math.PI));
-        environment.objects.push(Road.buildRoad(new Vector(1275, 372.5), 205, 0.5*Math.PI));
-        environment.objects.push(Road.buildRoad(new Vector(722.5, 525), 1005, 0*Math.PI));
-        environment.objects.push(Road.buildRoad(new Vector(170, 372.5), 205, 0.5*Math.PI));
-        environment.objects.push(new Checkpoint(new Vector(425, 220), 12, 90, 0*Math.PI, 0, false));
-        environment.objects.push(new Checkpoint(new Vector(722.5, 220), 12, 90, 0*Math.PI, 1, false));
-        environment.objects.push(new Checkpoint(new Vector(1275, 372.5), 12, 90, 0.5*Math.PI, 2, false));
-        environment.objects.push(new Checkpoint(new Vector(722.5, 525), 12, 90, 0*Math.PI, 3, false));
-        environment.objects.push(new Checkpoint(new Vector(170, 372.5), 12, 90, 0.5*Math.PI, 4, true));
+        environment.startPositions.push(new Vector(-24, -20));
+        environment.startPositions.push(new Vector(-24, 20));
+        environment.objects.push(Road.buildRoad(new Vector(0, 0), 600, 0*Math.PI));
+        environment.objects.push(Road.buildRoad(new Vector(350, 350), 600, 0.5*Math.PI));
+        environment.objects.push(Road.buildRoad(new Vector(0, 700), 600, 0*Math.PI));
+        environment.objects.push(Road.buildRoad(new Vector(-350, 350), 600, 0.5*Math.PI));
+        environment.objects.push(Road.buildRoad(new Vector(-350, -350), 600, 0.5*Math.PI));
+        environment.objects.push(Road.buildRoad(new Vector(-700, -700), 600, 0*Math.PI));
+        environment.objects.push(Road.buildRoad(new Vector(-1050, -350), 600, 0.5*Math.PI));
+        environment.objects.push(Road.buildRoad(new Vector(-700, 0), 600, 0*Math.PI));
+        environment.objects.push(Road.buildRoadCorner(new Vector(350, 0), 1.5*Math.PI));
+        environment.objects.push(Road.buildRoadCorner(new Vector(350, 700), 0*Math.PI));
+        environment.objects.push(Road.buildRoadCorner(new Vector(-350, 700), 0.5*Math.PI));
+        environment.objects.push(Road.buildRoadCorner(new Vector(-350, -700), 1.5*Math.PI));
+        environment.objects.push(Road.buildRoadCorner(new Vector(-1050, -700), 1*Math.PI));
+        environment.objects.push(Road.buildRoadCorner(new Vector(-1050, 0), 0.5*Math.PI));
+        environment.objects.push(Road.buildCrossroads(new Vector(-350, 0), 0*Math.PI));
+        environment.objects.push(new Checkpoint(new Vector(0, 0), 12, 90, 0*Math.PI, 0, false));
+        environment.objects.push(new Checkpoint(new Vector(350, 350), 12, 90, 0.5*Math.PI, 1, false));
+        environment.objects.push(new Checkpoint(new Vector(0, 700), 12, 90, 0*Math.PI, 2, false));
+        environment.objects.push(new Checkpoint(new Vector(-350, 350), 12, 90, 0.5*Math.PI, 3, false));
+        environment.objects.push(new Checkpoint(new Vector(-350, -350), 12, 90, 0.5*Math.PI, 4, false));
+        environment.objects.push(new Checkpoint(new Vector(-700, -700), 12, 90, 0*Math.PI, 5, false));
+        environment.objects.push(new Checkpoint(new Vector(-1050, -350), 12, 90, 0.5*Math.PI, 6, false));
+        environment.objects.push(new Checkpoint(new Vector(-700, 0), 12, 90, 0*Math.PI, 7, true));
         environments.push(environment);
     }
 
-    function changeEnvironment(environment: Environment) {
+    public function changeEnvironment(environment: Environment) {
         currentEnvironment = environment;
+        var n = 0;
         for(car in cars) {
             car.lap = 0;
             car.progress = 0;
             car.velocity = new Vector(0, 0);
-            car.position = currentEnvironment.startPositions[0];
+            car.position = currentEnvironment.startPositions[n];
+            car.angle = 0;
+            n ++;
+            if (n >= currentEnvironment.startPositions.length) {
+                n = 0;
+            }
         }
     }
 
